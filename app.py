@@ -148,5 +148,5 @@ def export_analysis(format):
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 8000))
-    debug_mode = os.getenv('FLASK_ENV') == 'development'
+    debug_mode = os.getenv('FLASK_ENV') != 'production'
     app.run(host='0.0.0.0', port=port, debug=debug_mode)

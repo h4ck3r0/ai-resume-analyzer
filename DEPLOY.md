@@ -37,7 +37,7 @@ This guide will help you deploy the AI Resume Pro application to Render.
 3. **Region**: Choose closest to your users
 4. **Branch**: `master`
 5. **Build Command**: `pip install -r requirements.txt && python -m nltk.downloader punkt`
-6. **Start Command**: `gunicorn app:app`
+6. **Start Command**: Leave blank (Procfile will be used automatically)
 7. **Instance Type**: Free (for testing) or Starter+ (recommended)
 
 ### 2.3 Add Environment Variables
