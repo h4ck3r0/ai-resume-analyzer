@@ -25,18 +25,32 @@
                     <div class="form-group">
                         <label for="job_description"><strong>Job Description</strong></label>
                         <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.75rem;">Paste the complete job description you're targeting</p>
-                        <textarea id="job_description" name="job_description" rows="6" placeholder="Example: Senior Software Engineer - 5+ years experience with React, Node.js, AWS..." required>{{ job_desc if job_desc else '' }}</textarea>
+                        <textarea id="job_description" name="job_description" rows="6" placeholder="Example: Senior Software Engineer - 5+ years experience with React, Node.js, AWS..." required style="font-size: 16px;">{{ job_desc if job_desc else '' }}</textarea>
                     </div>
 
                     <div class="form-group">
                         <label for="resume"><strong>Upload Your Resume</strong></label>
                         <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.75rem;">PDF format recommended for best results</p>
-                        <input type="file" id="resume" name="resume" accept="application/pdf" required style="padding: 2rem; border: 2px dashed #cbd5e1; background: white;">
+                        <input type="file" id="resume" name="resume" accept="application/pdf" required style="padding: 2rem; border: 2px dashed #cbd5e1; background: white; font-size: 16px;">
                     </div>
                 </div>
 
                 <button type="submit" class="btn-primary" style="width: 100%; padding: 1.2rem; font-size: 1.1rem;">🚀 Analyze Resume (Takes ~5 seconds)</button>
             </form>
+
+            <style>
+                @media (max-width: 768px) {
+                    div[style*="grid-template-columns: 1fr 1fr"] {
+                        grid-template-columns: 1fr !important;
+                        gap: 1.5rem !important;
+                    }
+                    
+                    textarea, input[type="file"] {
+                        padding: 1rem !important;
+                        font-size: 16px !important;
+                    }
+                }
+            </style>
         </div>
 
     {% if score %}

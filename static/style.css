@@ -1229,45 +1229,136 @@ footer {
 }
 
 @media (max-width: 480px) {
+    /* Extra aggressive mobile optimizations */
+    .navbar {
+        padding: 0.75rem 0;
+    }
+
+    .nav-container {
+        padding: 0 1rem;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .nav-brand a {
+        font-size: 1.2rem;
+    }
+
+    .logo-icon {
+        font-size: 1.25rem;
+    }
+
+    .nav-links {
+        gap: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .nav-links a {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .nav-btn {
+        padding: 0.6rem 1rem !important;
+        font-size: 0.85rem;
+    }
+
+    body > div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    body > div[style*="grid-template-columns: 1fr 1.5fr"] {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    body > div[style*="grid-template-columns: 1fr 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+
+    /* Form optimization for small screens */
+    div[style*="padding: 3rem"] {
+        padding: 1.5rem !important;
+    }
+
+    div[style*="padding: 2rem"] {
+        padding: 1rem !important;
+    }
+
+    /* Skill badges fit better on mobile */
+    span[style*="padding: 0.4rem 0.8rem"] {
+        font-size: 0.75rem !important;
+        padding: 0.3rem 0.6rem !important;
+    }
+
+    /* Lists should be readable */
+    ul, ol {
+        margin-left: 1rem !important;
+        font-size: 0.9rem;
+    }
+
+    /* Buttons should be full width on mobile */
+    button[style*="width: 100%"] {
+        padding: 1rem !important;
+    }
+
+    /* SVG score displays should be smaller */
+    svg[width="200"],
+    svg[width="180"] {
+        width: 100px !important;
+        height: auto !important;
+    }
+
+    /* Flex containers should stack on small phones */
+    div[style*="display: flex"][style*="gap: 2rem"] {
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+
+    /* Toggle switches stay centered */
+    label[style*="display: inline-block"] {
+        display: inline-block !important;
+    }
+
+    /* Page container padding */
     .page-container {
-        padding: 1rem;
+        padding: 2rem 1rem;
     }
 
     .container {
         padding: 1.5rem;
-        border-radius: var(--radius-lg);
     }
 
-    .hero-section h1 {
-        font-size: 1.5rem;
+    /* Reduce heading sizes for maximum 480px width */
+    h1 {
+        font-size: 1.4rem !important;
     }
 
-    .btn-primary,
-    .btn-secondary,
-    button[type="submit"] {
-        padding: 0.85rem 1.5rem;
-        font-size: 0.95rem;
+    h2 {
+        font-size: 1.1rem !important;
     }
 
-    .stats-section {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
+    h3 {
+        font-size: 1rem !important;
     }
 
-    .stat-number {
-        font-size: 1.75rem;
+    h4, h5 {
+        font-size: 0.95rem !important;
     }
 
-    .stat-label {
-        font-size: 0.85rem;
+    /* Ensure textarea fits properly */
+    textarea {
+        width: 100% !important;
+        min-height: 120px;
+        font-size: 16px !important;
     }
 
-    .section-header {
-        margin-bottom: 2rem;
-    }
-
-    .section-header h2 {
-        font-size: 1.5rem;
+    /* Input file styling */
+    input[type="file"] {
+        width: 100% !important;
+        padding: 1rem !important;
     }
 }
 
@@ -1684,6 +1775,131 @@ footer {
 
     .container {
         padding: 25px;
+    }
+
+    /* Mobile grid layouts for analyze page */
+    body > div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
+    }
+
+    body > div[style*="grid-template-columns: 1fr 1.5fr"] {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
+    }
+
+    /* Textarea and file input should be full width */
+    textarea, input[type="file"] {
+        width: 100% !important;
+        font-size: 16px !important;
+        padding: 1rem !important;
+    }
+
+    /* Form groups should stack */
+    .form-group {
+        width: 100% !important;
+    }
+
+    /* Score SVG should scale down on mobile */
+    svg[width="200"] {
+        width: 140px !important;
+        height: auto !important;
+    }
+
+    svg[width="180"] {
+        width: 120px !important;
+        height: auto !important;
+    }
+
+    /* Card layouts optimize for mobile */
+    div[style*="box-shadow: 0 4px 6px"] {
+        padding: 1.5rem !important;
+        margin-bottom: 1rem !important;
+    }
+
+    /* Skill grids should stack */
+    div[style*="grid-template-columns: 1fr 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    /* Reduce heading sizes on mobile */
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+    }
+
+    h4, h5 {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra aggressive mobile optimizations */
+    body > div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    body > div[style*="grid-template-columns: 1fr 1.5fr"] {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    body > div[style*="grid-template-columns: 1fr 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+
+    /* Form optimization for small screens */
+    div[style*="padding: 3rem"] {
+        padding: 1.5rem !important;
+    }
+
+    div[style*="padding: 2rem"] {
+        padding: 1rem !important;
+    }
+
+    /* Skill badges fit better on mobile */
+    span[style*="padding: 0.4rem 0.8rem"] {
+        font-size: 0.75rem !important;
+        padding: 0.3rem 0.6rem !important;
+    }
+
+    /* Lists should be readable */
+    ul, ol {
+        margin-left: 1rem !important;
+        font-size: 0.9rem;
+    }
+
+    /* Buttons should be full width on mobile */
+    button[style*="width: 100%"] {
+        padding: 1rem !important;
+    }
+
+    /* SVG score displays should be smaller */
+    svg[width="200"],
+    svg[width="180"] {
+        width: 100px !important;
+        height: auto !important;
+    }
+
+    /* Flex containers should stack on small phones */
+    div[style*="display: flex"][style*="gap: 2rem"] {
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+
+    /* Toggle switches stay centered */
+    label[style*="display: inline-block"] {
+        display: inline-block !important;
     }
 }
 
