@@ -1,12 +1,16 @@
 from flask import Flask, request, render_template, redirect, url_for, send_file, jsonify
 import os
 from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
 
 from extractor import extract_text_from_pdf, parse_resume_with_llm, generate_feedback, generate_template, analyze_skill_gaps
 from matcher import calculate_semantic_match, benchmark_score
 from export import export_to_csv, export_to_pdf
 from validators import validate_upload
 from grammar_checker import check_grammar_with_gemma
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -143,4 +147,6 @@ def export_analysis(format):
         return jsonify({"error": f"Export failed: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    port = int(os.getenv('PORT', 8000))
+    debug_mode = os.getenv('FLASK_ENV') == 'development'
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)

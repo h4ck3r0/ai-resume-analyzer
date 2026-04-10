@@ -1,4 +1,5 @@
 flask
+gunicorn
 pdfplumber
 sentence-transformers
 scikit-learn
