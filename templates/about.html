@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container container-wide">
+    <div class="about-header">
+        <h1>About AI Resume Pro</h1>
+        <p class="lead">The most intelligent resume optimization platform powered by Google's Gemini AI</p>
+    </div>
+
+    <!-- Mission Section -->
+    <div class="about-section">
+        <h2>Our Mission</h2>
+        <p>We believe talented professionals deserve better than the "black box" of Applicant Tracking Systems (ATS). Our mission is to democratize resume optimization by giving job seekers clear, actionable insights into how their resumes perform against real job requirements.</p>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="about-section">
+        <h2>How Our Technology Works</h2>
+        
+        <div class="tech-process">
+            <div class="process-step">
+                <div class="process-step-number">1</div>
+                <h3>Advanced PDF Parsing</h3>
+                <p>We use industry-leading PDF extraction techniques to convert your resume into structured, clean text. This ensures 100% accuracy in processing all resume formats.</p>
+            </div>
+
+            <div class="process-step">
+                <div class="process-step-number">2</div>
+                <h3>Semantic Vector Analysis</h3>
+                <p>Both your resume and the job description are converted into mathematical vectors using state-of-the-art sentence transformers. We then calculate cosine similarity to determine your true ATS match percentage.</p>
+            </div>
+
+            <div class="process-step">
+                <div class="process-step-number">3</div>
+                <h3>Intelligent Data Extraction</h3>
+                <p>Google's Gemini AI extracts and structures key information from your resume including name, contact details, skills, years of experience, and certifications.</p>
+            </div>
+
+            <div class="process-step">
+                <div class="process-step-number">4</div>
+                <h3>Gap Analysis</h3>
+                <p>We perform deep analysis to identify missing keywords, required skills you don't have, and opportunities to strengthen your candidacy.</p>
+            </div>
+
+            <div class="process-step">
+                <div class="process-step-number">5</div>
+                <h3>Personalized Recommendations</h3>
+                <p>Finally, Gemini generates three specific, actionable recommendations to improve your resume for this exact job description.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Features Section -->
+    <div class="about-section">
+        <h2>Advanced Capabilities</h2>
+        
+        <div class="features-list">
+            <div class="feature-item">
+                <h3>📊 Real-Time ATS Scoring</h3>
+                <p>Get an accurate percentage score that shows how well your resume aligns with the job description, calculated using semantic similarity algorithms.</p>
+            </div>
+
+            <div class="feature-item">
+                <h3>🎯 Industry Benchmarking</h3>
+                <p>See your percentile ranking compared to typical submissions. Understand if you're in the top 10%, 50%, or need to improve further.</p>
+            </div>
+
+            <div class="feature-item">
+                <h3>⚡ Skill Gap Analysis</h3>
+                <p>Get a detailed breakdown of present skills, required skills, missing skills, and proficiency matches for each technology.</p>
+            </div>
+
+            <div class="feature-item">
+                <h3>📝 AI Template Generation</h3>
+                <p>Generate customized resume templates with professional summaries and achievement bullet points tailored to your target role.</p>
+            </div>
+
+            <div class="feature-item">
+                <h3>📥 Multi-Format Export</h3>
+                <p>Download your complete analysis report as PDF or CSV for record-keeping, sharing with mentors, or tracking improvements over time.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technology Stack -->
+    <div class="about-section">
+        <h2>Technology Stack</h2>
+        <p>We use a carefully selected combination of modern technologies to deliver accurate, fast, and reliable resume analysis:</p>
+        
+        <div class="tech-stack">
+            <div class="tech-card">
+                <h4>Backend</h4>
+                <ul>
+                    <li><strong>Python & Flask</strong> - Robust web framework</li>
+                    <li><strong>Google Gemini 2.5</strong> - Advanced AI model</li>
+                    <li><strong>Sentence Transformers</strong> - Semantic embeddings</li>
+                    <li><strong>scikit-learn</strong> - ML algorithms</li>
+                    <li><strong>pdfplumber</strong> - PDF extraction</li>
+                </ul>
+            </div>
+
+            <div class="tech-card">
+                <h4>Frontend</h4>
+                <ul>
+                    <li><strong>HTML5</strong> - Semantic markup</li>
+                    <li><strong>CSS3</strong> - Modern styling</li>
+                    <li><strong>JavaScript</strong> - Interactivity</li>
+                    <li><strong>Jinja2</strong> - Template engine</li>
+                </ul>
+            </div>
+
+            <div class="tech-card">
+                <h4>Data & Export</h4>
+                <ul>
+                    <li><strong>ReportLab</strong> - PDF generation</li>
+                    <li><strong>CSV</strong> - Data export</li>
+                    <li><strong>JSON</strong> - Data format</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="about-section">
+        <h2>Frequently Asked Questions</h2>
+        
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h3>How accurate is the ATS score?</h3>
+                <p>Our ATS score is based on semantic similarity calculations, which are highly accurate. However, real ATS systems vary. Our score represents your best-case scenario for matching the target job description.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Is my resume data stored?</h3>
+                <p>No. All analysis happens in real-time. Your resume is processed on-the-fly and deleted immediately after analysis. We prioritize your privacy and don't store any personal data.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>What file formats are supported?</h3>
+                <p>Currently, we support PDF files. We recommend saving your resume as PDF from Word or Google Docs for best results.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>How long does analysis take?</h3>
+                <p>Most analyses complete in 30-60 seconds. If the Gemini API is experiencing high demand, it may take up to 2 minutes due to automatic retries.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Can I use the same resume for multiple jobs?</h3>
+                <p>Yes! You can analyze the same resume against different job descriptions to see how it performs. We recommend tailoring your resume for each position to maximize your ATS score.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>What if I get a low ATS score?</h3>
+                <p>Our analysis provides specific recommendations to improve your score. Focus on adding the recommended keywords and skills, then re-analyze to track your progress.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact CTA -->
+    <div class="cta-box">
+        <h2>Get Started Today</h2>
+        <p>Join thousands of job seekers who have optimized their resumes and landed interviews with our AI-powered platform.</p>
+        <a href="{{ url_for('analyze') }}" class="btn-primary">Analyze Your Resume</a>
+    </div>
+</div>
+{% endblock %}

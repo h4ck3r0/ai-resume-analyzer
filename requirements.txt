@@ -1,0 +1,10 @@
+flask
+pdfplumber
+sentence-transformers
+scikit-learn
+werkzeug
+google-genai
+python-dotenv
+reportlab
+textblob
+nltk

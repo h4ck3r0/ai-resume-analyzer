@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1>Land Your Dream Job with AI-Powered Resume Analysis</h1>
+        <p class="hero-subtitle">Optimize your resume instantly with advanced AI technology. Get real-time ATS scoring, AI-extracted insights, and personalized recommendations to beat applicant tracking systems.</p>
+        
+        <div class="hero-buttons">
+            <a href="{{ url_for('analyze') }}" class="btn-primary btn-large">Analyze Your Resume Now</a>
+            <a href="#features" class="btn-secondary btn-large">Learn More</a>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Section -->
+<div class="stats-section">
+    <div class="stat-item">
+        <div class="stat-number">10,000+</div>
+        <div class="stat-label">Resumes Analyzed</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">92%</div>
+        <div class="stat-label">Average Improvement</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">45s</div>
+        <div class="stat-label">Analysis Time</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">User Satisfaction</div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div id="features" class="features-section">
+    <div class="section-header">
+        <h2>Powerful Features</h2>
+        <p>Everything you need to optimize your resume and get hired</p>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>ATS Match Score</h3>
+            <p>Our advanced semantic analysis calculates how perfectly your resume aligns with the job description. Get a clear percentage score and understand your competitive advantage.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🧠</div>
+            <h3>AI-Powered Extraction</h3>
+            <p>Instantly extract and structure your resume data including name, contact info, skills, and years of experience using Google's Gemini AI.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">💡</div>
+            <h3>Smart Recommendations</h3>
+            <p>Receive actionable, personalized suggestions on exactly which keywords and skills you need to add to beat the resume screening robots.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Skill Gap Analysis</h3>
+            <p>See exactly which skills are missing from your resume, which ones you have, and get a breakdown of required qualifications vs. your experience.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Industry Benchmarking</h3>
+            <p>Compare your ATS score against industry standards and see your percentile ranking among typical submissions.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📥</div>
+            <h3>Export & Share</h3>
+            <p>Download your detailed analysis report as PDF or CSV. Perfect for tracking improvements and sharing with mentors.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📝</div>
+            <h3>Template Generation</h3>
+            <p>Get AI-generated resume templates customized for your target role, with suggested sections and achievement bullet points.</p>
+        </div>
+
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="how-it-works">
+    <div class="section-header">
+        <h2>How It Works</h2>
+        <p>Simple, fast, and powerful resume analysis in three steps</p>
+    </div>
+
+    <div class="steps-grid">
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>Upload Your Resume</h3>
+                <p>Simply upload your resume in PDF format and paste the job description you're targeting.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>AI Analysis</h3>
+                <p>Our advanced AI algorithms analyze your resume semantic similarity, extract key information, and identify skill gaps in seconds.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h3>Get Results & Recommendations</h3>
+                <p>Receive your ATS score, detailed analysis, skill gap breakdown, and personalized recommendations to improve your chances.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Technology Stack Section -->
+<div class="tech-section">
+    <div class="section-header">
+        <h2>Powered By Advanced Technology</h2>
+        <p>We use cutting-edge AI and machine learning technologies</p>
+    </div>
+
+    <div class="tech-grid">
+        <div class="tech-item">
+            <h4>Google Gemini AI</h4>
+            <p>Advanced language model for intelligent resume analysis and personalized recommendations</p>
+        </div>
+        <div class="tech-item">
+            <h4>Semantic Embeddings</h4>
+            <p>Vector-based similarity calculation for accurate ATS scoring and job-resume matching</p>
+        </div>
+        <div class="tech-item">
+            <h4>Machine Learning</h4>
+            <p>Continuously improving algorithms that learn from thousands of successful resume optimizations</p>
+        </div>
+        <div class="tech-item">
+            <h4>Natural Language Processing</h4>
+            <p>Deep understanding of resume language, job requirements, and skill sets</p>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="cta-section">
+    <h2>Ready to Optimize Your Resume?</h2>
+    <p>Join thousands of job seekers who have improved their ATS scores and landed interviews</p>
+    <a href="{{ url_for('analyze') }}" class="btn-primary btn-large">Start Your Analysis Now</a>
+</div>
+
+{% endblock %}

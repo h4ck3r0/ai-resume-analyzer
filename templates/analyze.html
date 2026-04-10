@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-container">
+    <div class="container wide">
+        <!-- Hero Section -->
+        <div class="hero-section" style="text-align: center; margin-bottom: 3rem;">
+            <h1>📊 Resume Analyzer</h1>
+            <p class="hero-subtitle">Optimize your resume for ATS systems and get actionable feedback to increase your chances of landing an interview.</p>
+        </div>
+
+        <!-- Analysis Form -->
+        <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05)); border-radius: 16px; padding: 3rem; margin-bottom: 2rem; border: 1px solid #e2e8f0;">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Start Your Analysis</h2>
+            
+            {% if error %}
+                <div style="background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem; margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center; color: #991b1b;">
+                    <span style="font-size: 1.5rem;">⚠️</span>
+                    <div><strong>Error:</strong> {{ error }}</div>
+                </div>
+            {% endif %}
+
+            <form action="/analyze" method="POST" enctype="multipart/form-data">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                    <div class="form-group">
+                        <label for="job_description"><strong>Job Description</strong></label>
+                        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.75rem;">Paste the complete job description you're targeting</p>
+                        <textarea id="job_description" name="job_description" rows="6" placeholder="Example: Senior Software Engineer - 5+ years experience with React, Node.js, AWS..." required>{{ job_desc if job_desc else '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="resume"><strong>Upload Your Resume</strong></label>
+                        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.75rem;">PDF format recommended for best results</p>
+                        <input type="file" id="resume" name="resume" accept="application/pdf" required style="padding: 2rem; border: 2px dashed #cbd5e1; background: white;">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 1.2rem; font-size: 1.1rem;">🚀 Analyze Resume (Takes ~5 seconds)</button>
+            </form>
+        </div>
+
+    {% if score %}
+    <!-- RESULTS SECTION - NEW DESIGN -->
+    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem; margin-bottom: 3rem;">
+        
+        <!-- LEFT CARD: Score & Options -->
+        <div style="background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: #1e293b; font-size: 1.5rem;">Your Score</h2>
+            
+            <!-- Score Gauge SVG -->
+            <svg width="200" height="120" style="display: block; margin: 0 auto 2rem; background: transparent;" viewBox="0 0 200 120">
+                <!-- Background arc -->
+                <path d="M 40 100 A 60 60 0 0 1 160 100" stroke="#e2e8f0" stroke-width="8" fill="none" stroke-linecap="round"/>
+                <!-- Filled arc based on score -->
+                <path id="scoreArc" d="M 40 100 A 60 60 0 0 1 160 100" stroke="#6366f1" stroke-width="8" fill="none" stroke-linecap="round" style="stroke-dasharray: 0, 200;"/>
+                <!-- Score point: 85% = 0.85 * 120 ≈ 102 degrees -->
+                <circle id="scorePoint" cx="145" cy="55" r="6" fill="#6366f1"/>
+            </svg>
+            
+            <!-- Score display -->
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="font-size: 3rem; font-weight: 700; color: #6366f1;">{{ score }}</div>
+                <div style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem;">ATS Match Score</div>
+                <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 0.5rem 1rem; border-radius: 20px; display: inline-block; margin-top: 1rem; font-weight: 600; font-size: 0.85rem;">{{ rating }}</div>
+            </div>
+
+            <!-- Toggle Options -->
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 1.5rem; margin-bottom: 1.5rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; color: #94a3b8; text-transform: uppercase; margin-bottom: 1rem;">Report Sections</div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">CONTENT</span>
+                        <label style="position: relative; display: inline-block; width: 40px; height: 24px; margin: 0;">
+                            <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; border-radius: 12px; transition: 0.3s;"></span>
+                        </label>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">SECTION</span>
+                        <label style="position: relative; display: inline-block; width: 40px; height: 24px; margin: 0;">
+                            <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; border-radius: 12px; transition: 0.3s;"></span>
+                        </label>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">ATS ESSENTIALS</span>
+                        <label style="position: relative; display: inline-block; width: 40px; height: 24px; margin: 0;">
+                            <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; border-radius: 12px; transition: 0.3s;"></span>
+                        </label>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">TAILORING</span>
+                        <label style="position: relative; display: inline-block; width: 40px; height: 24px; margin: 0;">
+                            <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; border-radius: 12px; transition: 0.3s;"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unlock Full Report Button -->
+            <button style="width: 100%; padding: 1rem; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; color: #64748b; font-weight: 600; cursor: pointer; transition: all 0.3s;" onclick="alert('Full report feature coming soon!')">Unlock Full Report</button>
+        </div>
+
+        <!-- RIGHT CARD: Analysis Steps Checklist -->
+        <div style="background: linear-gradient(135deg, #dbeafe, #ddd6fe); border-radius: 16px; padding: 2rem; min-height: 400px; display: flex; flex-direction: column; justify-content: center;">
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <!-- Parsing -->
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <span style="color: white; font-weight: bold;">✓</span>
+                    </div>
+                    <span style="font-size: 1.1rem; color: #1e293b; font-weight: 500;">Parsing your resume</span>
+                </div>
+
+                <!-- Analyzing Experience -->
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <span style="color: white; font-weight: bold;">✓</span>
+                    </div>
+                    <span style="font-size: 1.1rem; color: #1e293b; font-weight: 500;">Analyzing your experience</span>
+                </div>
+
+                <!-- Extracting Skills -->
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <span style="color: white; font-weight: bold;">✓</span>
+                    </div>
+                    <span style="font-size: 1.1rem; color: #1e293b; font-weight: 500;">Extracting your skills</span>
+                </div>
+
+                <!-- Generating Recommendations -->
+                <div style="display: flex; gap: 1rem; align-items: center; opacity: 0.7;">
+                    <div style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <span style="color: #cbd5e1; font-weight: bold;"></span>
+                    </div>
+                    <span style="font-size: 1.1rem; color: #1e293b; font-weight: 500;">Generating recommendations</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DETAILED RESULTS SECTION -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+        
+        <!-- Score Details -->
+        <div style="background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+            <h3 style="color: #1e293b; margin-bottom: 1.5rem; font-size: 1.1rem;">📊 Score Breakdown</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #e2e8f0;">
+                    <span style="color: #64748b;">Percentile</span>
+                    <strong style="color: #1e293b;">{{ percentile }}th</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #e2e8f0;">
+                    <span style="color: #64748b;">Industry Average</span>
+                    <strong style="color: #1e293b;">{{ industry_avg }}%</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0;">
+                    <span style="color: #64748b;">Comparison</span>
+                    <strong style="color: {% if comparison == 'Above' %}#10b981{% else %}#ef4444{% endif %};">{{ comparison }} Average</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Extracted Data -->
+        <div style="background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+            <h3 style="color: #1e293b; margin-bottom: 1.5rem; font-size: 1.1rem;">✍️ Grammar & Quality Check</h3>
+            {% if grammar_check and not grammar_check.get('error') %}
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f0f9ff; border-radius: 8px;">
+                        <span style="color: #64748b;">Grammar Score</span>
+                        <div style="background: #6366f1; color: white; padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: 600; font-size: 0.85rem;">{{ grammar_check.get('grammar_score', 0) }}%</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f5f3ff; border-radius: 8px;">
+                        <span style="color: #64748b;">Spelling Score</span>
+                        <div style="background: #8b5cf6; color: white; padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: 600; font-size: 0.85rem;">{{ grammar_check.get('spelling_score', 0) }}%</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #fef3c7; border-radius: 8px;">
+                        <span style="color: #64748b;">Formatting Score</span>
+                        <div style="background: #f59e0b; color: white; padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: 600; font-size: 0.85rem;">{{ grammar_check.get('formatting_score', 0) }}%</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: linear-gradient(135deg, #f0f9ff, #f5f3ff); border-radius: 8px; font-weight: 600;">
+                        <span style="color: #1e293b;">Overall Quality</span>
+                        <div style="font-size: 1.5rem; color: #6366f1;">{{ grammar_check.get('overall_quality_score', 0) }}%</div>
+                    </div>
+                </div>
+            {% else %}
+                <div style="text-align: center; color: #94a3b8; padding: 1rem;">
+                    <p>⚠️ Unable to analyze grammar</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Skill Gaps -->
+    {% if skill_gaps and not skill_gaps.get('error') %}
+    <div style="background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin-bottom: 2rem;">
+        <h3 style="color: #1e293b; margin-bottom: 1.5rem; font-size: 1.1rem;">⚡ Skill Gap Analysis</h3>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem;">
+            {% if skill_gaps.get('present_skills') and skill_gaps['present_skills']|length > 0 %}
+            <div>
+                <h4 style="color: #10b981; margin-bottom: 1rem; font-size: 0.95rem; font-weight: 600;">✓ Your Skills</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    {% for skill in skill_gaps['present_skills'][:8] %}
+                        <span style="background: #d1fae5; color: #065f46; padding: 0.4rem 0.8rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if skill_gaps.get('missing_skills') and skill_gaps['missing_skills']|length > 0 %}
+            <div>
+                <h4 style="color: #ef4444; margin-bottom: 1rem; font-size: 0.95rem; font-weight: 600;">✗ Missing Skills</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    {% for skill in skill_gaps['missing_skills'][:8] %}
+                        <span style="background: #fee2e2; color: #991b1b; padding: 0.4rem 0.8rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if skill_gaps.get('required_skills') and skill_gaps['required_skills']|length > 0 %}
+            <div>
+                <h4 style="color: #8b5cf6; margin-bottom: 1rem; font-size: 0.95rem; font-weight: 600;">🎯 Job Requirements</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    {% for skill in skill_gaps['required_skills'][:8] %}
+                        <span style="background: #f3e8ff; color: #6b21a8; padding: 0.4rem 0.8rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Improvement Suggestions with Detailed Grammar Feedback -->
+    <div style="background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="color: #1e293b; font-size: 1.1rem; margin: 0;">💡 Detailed Improvement Suggestions</h3>
+            <button class="btn-secondary" onclick="exportAs('pdf')" style="padding: 0.5rem 1rem; font-size: 0.9rem;">📄 Export PDF</button>
+        </div>
+        
+        {% if grammar_check and grammar_check.get('improvements') and grammar_check['improvements']|length > 0 %}
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                {% for improvement in grammar_check['improvements'] %}
+                <div style="border-left: 4px solid 
+                    {% if improvement.get('type') == 'grammar' %}#6366f1
+                    {% elif improvement.get('type') == 'spelling' %}#8b5cf6
+                    {% elif improvement.get('type') == 'formatting' %}#f59e0b
+                    {% else %}#10b981{% endif %};
+                    background: #f8fafc; padding: 1.25rem; border-radius: 6px;">
+                    
+                    <div style="display: flex; align-items: start; gap: 1rem;">
+                        <div style="background: 
+                            {% if improvement.get('type') == 'grammar' %}#e0e7ff
+                            {% elif improvement.get('type') == 'spelling' %}#f3e8ff
+                            {% elif improvement.get('type') == 'formatting' %}#fef3c7
+                            {% else %}#d1fae5{% endif %};
+                            padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: 
+                            {% if improvement.get('type') == 'grammar' %}#4f46e5
+                            {% elif improvement.get('type') == 'spelling' %}#7c3aed
+                            {% elif improvement.get('type') == 'formatting' %}#d97706
+                            {% else %}#059669{% endif %};">
+                            {{ improvement.get('type', 'tip') }}
+                        </div>
+                        <div style="flex: 1;">
+                            <h4 style="color: #1e293b; margin: 0 0 0.5rem 0; font-size: 0.95rem;">
+                                {% if improvement.get('issue') %}{{ improvement['issue'] }}{% else %}Improvement needed{% endif %}
+                            </h4>
+                            {% if improvement.get('location') %}
+                            <p style="font-size: 0.85rem; color: #64748b; margin: 0.25rem 0;">
+                                <strong>Where:</strong> {{ improvement['location'] }}
+                            </p>
+                            {% endif %}
+                            {% if improvement.get('fix') %}
+                            <p style="font-size: 0.85rem; color: #1e293b; margin: 0.5rem 0 0 0; padding: 0.75rem; background: #fafafa; border-radius: 4px; border-left: 3px solid #10b981;">
+                                <strong>How to fix:</strong> {{ improvement['fix'] }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% elif feedback and feedback|length > 0 %}
+            <div>
+                {% for suggestion in feedback %}
+                <div style="background: #f8fafc; padding: 1rem; border-left: 4px solid #6366f1; border-radius: 4px; margin-bottom: 0.75rem;">
+                    <p style="color: #1e293b; margin: 0;">{{ suggestion }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 2rem; color: #94a3b8;">
+                <p>💭 Generating recommendations...</p>
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+<script>
+// Score gauge animation
+function animateGauge() {
+    const scoreText = "{{ score }}".replace('%', '');
+    const percentage = parseInt(scoreText) / 100;
+    const arcLength = 120 * percentage;
+    const arc = document.getElementById('scoreArc');
+    if (arc) {
+        arc.style.strokeDasharray = arcLength + ', 200';
+    }
+}
+
+// Export function
+function exportAs(format) {
+    const analysisData = {
+        score: "{{ score }}",
+        rating: "{{ rating }}",
+        percentile: {{ percentile }},
+        industry_average: {{ industry_avg }},
+        comparison: "{{ comparison }}",
+        data: {{ data | tojson }},
+        feedback: {{ feedback | tojson }},
+        skill_gaps: {{ skill_gaps | tojson }}
+    };
+    
+    fetch(`/export/${format}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(analysisData)
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `resume_analysis.${format}`;
+        a.click();
+    });
+}
+
+// Run animations on load
+setTimeout(animateGauge, 100);
+</script>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="{{ url_for('home') }}">
+                    <span class="logo-icon">📄</span> AI Resume Pro
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('analyze') }}" class="nav-btn">Analyzer</a></li>
+                <li><a href="{{ url_for('template_generation') }}" class="nav-btn">Template</a></li>
+                <li><a href="{{ url_for('about') }}">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="page-container fade-in">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2026 AI Resume Pro. Built with Gemini & Flask.</p>
+    </footer>
+
+</body>
+</html>
