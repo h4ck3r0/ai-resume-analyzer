@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, send_file, jsonify
 import os
+import gc
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 
@@ -16,6 +17,12 @@ app = Flask(__name__)
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# Cleanup handler to free memory after each request
+@app.teardown_appcontext
+def cleanup_after_request(error=None):
+    """Perform garbage collection after each request to free memory."""
+    gc.collect()
 
 @app.route('/')
 def home():

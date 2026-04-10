@@ -1,7 +1,15 @@
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+# Lazy load model to save memory at startup
+_model = None
+
+def _get_model():
+    """Lazy load the sentence transformer model."""
+    global _model
+    if _model is None:
+        _model = SentenceTransformer('all-MiniLM-L6-v2')
+    return _model
 
 def calculate_semantic_match(resume_text: str, job_description: str) -> float:
     """
@@ -10,6 +18,7 @@ def calculate_semantic_match(resume_text: str, job_description: str) -> float:
     if not resume_text or not job_description:
         return 0.0
 
+    model = _get_model()
     embeddings = model.encode([resume_text, job_description])
     
     resume_vector = embeddings[0].reshape(1, -1)

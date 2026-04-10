@@ -80,14 +80,23 @@ GOOGLE_API_KEY=your_actual_gemini_api_key_here
 - Verify `GOOGLE_API_KEY` is set correctly
 - Restart the service
 
-**3. PDF Upload Fails**
+**3. "Out of Memory (512MB)" Error**
+- ✅ **Already optimized in code:**
+  - Lazy loading of sentence-transformers model
+  - Gunicorn uses 1 worker with memory cleanup
+  - Garbage collection runs after each request
+  - Worker recycling every 10 requests
+- If still happening: Consider upgrading to **Starter+ ($7/month)** which has 512MB baseline
+
+**4. PDF Upload Fails**
 - Check file size (must be 10KB-5MB)
 - Ensure it's valid PDF format
 - Check Render logs for details
 
-**4. Slow First Request**
+**5. Slow First Request**
 - Free tier goes to sleep after 15 min inactivity
 - First request wakes it up (can be 30+ seconds)
+- Request to wake: Visit your app URL
 - Upgrade to Starter+ for always-on instance
 
 ### View Logs
