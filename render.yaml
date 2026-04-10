@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: ai-resume-pro
+    env: python
+    plan: free
+    pythonVersion: 3.11
+    
+    buildCommand: |
+      pip install -r requirements.txt && \
+      python -m nltk.downloader punkt
+    
+    startCommand: |
+      gunicorn --bind 0.0.0.0:$PORT \
+      --workers 1 \
+      --worker-class sync \
+      --timeout 120 \
+      --access-logfile - \
+      --error-logfile - \
+      wsgi:app
+    
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: GOOGLE_API_KEY
+        scope: secret
