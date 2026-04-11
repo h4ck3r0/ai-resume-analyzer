@@ -1,167 +1,214 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container container-wide">
-    <div class="about-header">
-        <h1>About AI Resume Pro</h1>
-        <p class="lead">The most intelligent resume optimization platform powered by Google's Gemini AI</p>
+<!-- Hero Section -->
+<section style="background: linear-gradient(to bottom right, #f8fafc, white, #f1f5f9); padding: 4rem 2rem; text-align: center;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+        <h1 style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 50%, var(--tertiary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem;">
+            About AI Resume Analyzer
+        </h1>
+        <p style="font-size: 1.1rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto;">
+            The most intelligent resume optimization platform powered by Google's advanced AI. Created to help professionals succeed in their careers.
+        </p>
     </div>
+</section>
 
-    <!-- Mission Section -->
-    <div class="about-section">
-        <h2>Our Mission</h2>
-        <p>We believe talented professionals deserve better than the "black box" of Applicant Tracking Systems (ATS). Our mission is to democratize resume optimization by giving job seekers clear, actionable insights into how their resumes perform against real job requirements.</p>
+<!-- Mission Section -->
+<section style="padding: 4rem 2rem; background: var(--bg-primary); border-bottom: 1px solid var(--border-light);">
+    <div style="max-width: 900px; margin: 0 auto;">
+        <div class="card" style="padding: 3rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05)); border-left: 4px solid var(--primary);">
+            <h2 class="section-header" style="margin-bottom: 1rem;">🎯 Our Mission</h2>
+            <p style="font-size: 1.1rem; color: var(--text-secondary); line-height: 1.8; margin: 0;">
+                We believe talented professionals deserve better than the "black box" of Applicant Tracking Systems (ATS). Our mission is to democratize resume optimization by giving job seekers clear, actionable insights into how their resumes perform against real job requirements.
+            </p>
+        </div>
     </div>
+</section>
 
-    <!-- How It Works Section -->
-    <div class="about-section">
-        <h2>How Our Technology Works</h2>
-        
-        <div class="tech-process">
-            <div class="process-step">
-                <div class="process-step-number">1</div>
-                <h3>Advanced PDF Parsing</h3>
-                <p>We use industry-leading PDF extraction techniques to convert your resume into structured, clean text. This ensures 100% accuracy in processing all resume formats.</p>
+<!-- Technology Process -->
+<section style="padding: 4rem 2rem; background: linear-gradient(to bottom, white, #f8fafc);">
+    <div style="max-width: 1200px; margin: 0 auto;">
+        <h2 class="section-header" style="text-align: center; margin-bottom: 3rem;">How Our Technology Works</h2>
+
+        <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <!-- Process Step 1 -->
+            <div class="card" style="padding: 2rem; border-top: 4px solid #f59e0b;">
+                <div style="font-size: 1.5rem; font-weight: 800; color: #f59e0b; margin-bottom: 1rem;">01</div>
+                <h3 style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Advanced PDF Parsing</h3>
+                <p style="color: var(--text-secondary); line-height: 1.6;">We use industry-leading PDF extraction techniques to convert your resume into structured, clean text. This ensures 100% accuracy in processing all resume formats.</p>
             </div>
 
-            <div class="process-step">
-                <div class="process-step-number">2</div>
-                <h3>Semantic Vector Analysis</h3>
-                <p>Both your resume and the job description are converted into mathematical vectors using state-of-the-art sentence transformers. We then calculate cosine similarity to determine your true ATS match percentage.</p>
+            <!-- Process Step 2 -->
+            <div class="card" style="padding: 2rem; border-top: 4px solid #06b6d4;">
+                <div style="font-size: 1.5rem; font-weight: 800; color: #06b6d4; margin-bottom: 1rem;">02</div>
+                <h3 style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Semantic Vector Analysis</h3>
+                <p style="color: var(--text-secondary); line-height: 1.6;">Both your resume and job description are converted into mathematical vectors using state-of-the-art sentence transformers. We then calculate cosine similarity to determine your ATS match percentage.</p>
             </div>
 
-            <div class="process-step">
-                <div class="process-step-number">3</div>
-                <h3>Intelligent Data Extraction</h3>
-                <p>Google's Gemini AI extracts and structures key information from your resume including name, contact details, skills, years of experience, and certifications.</p>
+            <!-- Process Step 3 -->
+            <div class="card" style="padding: 2rem; border-top: 4px solid var(--secondary);">
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--secondary); margin-bottom: 1rem;">03</div>
+                <h3 style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Intelligent Data Extraction</h3>
+                <p style="color: var(--text-secondary); line-height: 1.6;">Google's Gemini AI extracts and structures key information from your resume including name, contact details, skills, and certifications.</p>
             </div>
 
-            <div class="process-step">
-                <div class="process-step-number">4</div>
-                <h3>Gap Analysis</h3>
-                <p>We perform deep analysis to identify missing keywords, required skills you don't have, and opportunities to strengthen your candidacy.</p>
-            </div>
-
-            <div class="process-step">
-                <div class="process-step-number">5</div>
-                <h3>Personalized Recommendations</h3>
-                <p>Finally, Gemini generates three specific, actionable recommendations to improve your resume for this exact job description.</p>
+            <!-- Process Step 4 -->
+            <div class="card" style="padding: 2rem; border-top: 4px solid var(--primary);">
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary); margin-bottom: 1rem;">04</div>
+                <h3 style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Gap Analysis & Recommendations</h3>
+                <p style="color: var(--text-secondary); line-height: 1.6;">We identify missing keywords, required skills you don't have, and opportunities to strengthen your candidacy with personalized recommendations.</p>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- Key Features Section -->
-    <div class="about-section">
-        <h2>Advanced Capabilities</h2>
-        
-        <div class="features-list">
-            <div class="feature-item">
-                <h3>📊 Real-Time ATS Scoring</h3>
-                <p>Get an accurate percentage score that shows how well your resume aligns with the job description, calculated using semantic similarity algorithms.</p>
+<!-- Advanced Capabilities -->
+<section style="padding: 4rem 2rem; background: var(--bg-primary); border-bottom: 1px solid var(--border-light);">
+    <div style="max-width: 1200px; margin: 0 auto;">
+        <h2 class="section-header" style="text-align: center; margin-bottom: 3rem;">Advanced Capabilities</h2>
+
+        <div class="grid-3">
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                <h3 style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem;">Real-Time ATS Scoring</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Get an accurate percentage score that shows how well your resume aligns with the job description.</p>
             </div>
 
-            <div class="feature-item">
-                <h3>🎯 Industry Benchmarking</h3>
-                <p>See your percentile ranking compared to typical submissions. Understand if you're in the top 10%, 50%, or need to improve further.</p>
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+                <h3 style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem;">Skill Gap Analysis</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Get a detailed breakdown of present skills, required skills, missing skills, and proficiency matches.</p>
             </div>
 
-            <div class="feature-item">
-                <h3>⚡ Skill Gap Analysis</h3>
-                <p>Get a detailed breakdown of present skills, required skills, missing skills, and proficiency matches for each technology.</p>
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📝</div>
+                <h3 style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem;">AI Template Generation</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Generate customized resume templates with professional summaries tailored to your target role.</p>
             </div>
 
-            <div class="feature-item">
-                <h3>📝 AI Template Generation</h3>
-                <p>Generate customized resume templates with professional summaries and achievement bullet points tailored to your target role.</p>
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                <h3 style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem;">Industry Benchmarking</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">See your percentile ranking compared to typical submissions in your field.</p>
             </div>
 
-            <div class="feature-item">
-                <h3>📥 Multi-Format Export</h3>
-                <p>Download your complete analysis report as PDF or CSV for record-keeping, sharing with mentors, or tracking improvements over time.</p>
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📥</div>
+                <h3 style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem;">Multi-Format Export</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Download your analysis report as PDF or CSV for tracking improvements over time.</p>
+            </div>
+
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">⚡</div>
+                <h3 style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem;">Lightning Fast</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Most analyses complete in 30-60 seconds with state-of-the-art infrastructure.</p>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- Technology Stack -->
-    <div class="about-section">
-        <h2>Technology Stack</h2>
-        <p>We use a carefully selected combination of modern technologies to deliver accurate, fast, and reliable resume analysis:</p>
-        
-        <div class="tech-stack">
-            <div class="tech-card">
-                <h4>Backend</h4>
-                <ul>
+<!-- Technology Stack -->
+<section style="padding: 4rem 2rem; background: linear-gradient(to bottom, white, #f8fafc);">
+    <div style="max-width: 1200px; margin: 0 auto;">
+        <h2 class="section-header" style="text-align: center; margin-bottom: 3rem;">Technology Stack</h2>
+
+        <div class="grid-3">
+            <!-- Backend -->
+            <div class="card" style="padding: 2rem;">
+                <h3 style="font-weight: 600; color: var(--primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.5rem;">⚙️</span> Backend
+                </h3>
+                <ul style="margin: 0; padding-left: 1.5rem; color: var(--text-secondary); line-height: 2; font-size: 0.95rem;">
                     <li><strong>Python & Flask</strong> - Robust web framework</li>
-                    <li><strong>Google Gemini 2.5</strong> - Advanced AI model</li>
+                    <li><strong>Google Gemini AI</strong> - Advanced AI model</li>
                     <li><strong>Sentence Transformers</strong> - Semantic embeddings</li>
                     <li><strong>scikit-learn</strong> - ML algorithms</li>
                     <li><strong>pdfplumber</strong> - PDF extraction</li>
                 </ul>
             </div>
 
-            <div class="tech-card">
-                <h4>Frontend</h4>
-                <ul>
+            <!-- Frontend -->
+            <div class="card" style="padding: 2rem;">
+                <h3 style="font-weight: 600; color: var(--secondary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.5rem;">🎨</span> Frontend
+                </h3>
+                <ul style="margin: 0; padding-left: 1.5rem; color: var(--text-secondary); line-height: 2; font-size: 0.95rem;">
                     <li><strong>HTML5</strong> - Semantic markup</li>
                     <li><strong>CSS3</strong> - Modern styling</li>
                     <li><strong>JavaScript</strong> - Interactivity</li>
                     <li><strong>Jinja2</strong> - Template engine</li>
+                    <li><strong>Design System</strong> - Component library</li>
                 </ul>
             </div>
 
-            <div class="tech-card">
-                <h4>Data & Export</h4>
-                <ul>
+            <!-- Data & Export -->
+            <div class="card" style="padding: 2rem;">
+                <h3 style="font-weight: 600; color: var(--tertiary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.5rem;">📊</span> Data & Export
+                </h3>
+                <ul style="margin: 0; padding-left: 1.5rem; color: var(--text-secondary); line-height: 2; font-size: 0.95rem;">
                     <li><strong>ReportLab</strong> - PDF generation</li>
-                    <li><strong>CSV</strong> - Data export</li>
-                    <li><strong>JSON</strong> - Data format</li>
+                    <li><strong>CSV</strong> - Data export format</li>
+                    <li><strong>JSON</strong> - Data interchange</li>
+                    <li><strong>NLTK & TextBlob</strong> - NLP processing</li>
                 </ul>
             </div>
         </div>
-    </div>
 
-    <!-- FAQ Section -->
-    <div class="about-section">
-        <h2>Frequently Asked Questions</h2>
-        
-        <div class="faq-grid">
-            <div class="faq-item">
-                <h3>How accurate is the ATS score?</h3>
-                <p>Our ATS score is based on semantic similarity calculations, which are highly accurate. However, real ATS systems vary. Our score represents your best-case scenario for matching the target job description.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>Is my resume data stored?</h3>
-                <p>No. All analysis happens in real-time. Your resume is processed on-the-fly and deleted immediately after analysis. We prioritize your privacy and don't store any personal data.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>What file formats are supported?</h3>
-                <p>Currently, we support PDF files. We recommend saving your resume as PDF from Word or Google Docs for best results.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>How long does analysis take?</h3>
-                <p>Most analyses complete in 30-60 seconds. If the Gemini API is experiencing high demand, it may take up to 2 minutes due to automatic retries.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>Can I use the same resume for multiple jobs?</h3>
-                <p>Yes! You can analyze the same resume against different job descriptions to see how it performs. We recommend tailoring your resume for each position to maximize your ATS score.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>What if I get a low ATS score?</h3>
-                <p>Our analysis provides specific recommendations to improve your score. Focus on adding the recommended keywords and skills, then re-analyze to track your progress.</p>
-            </div>
+        <div class="card" style="margin-top: 2rem; padding: 2rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05)); text-align: center;">
+            <p style="color: var(--text-secondary); margin: 0; line-height: 1.8;">
+                <strong>Hosting & Performance:</strong> Optimized for local and cloud deployment with proper WSGI configuration, Gunicorn workers, and automatic garbage collection for maximum efficiency.
+            </p>
         </div>
     </div>
+</section>
 
-    <!-- Contact CTA -->
-    <div class="cta-box">
-        <h2>Get Started Today</h2>
-        <p>Join thousands of job seekers who have optimized their resumes and landed interviews with our AI-powered platform.</p>
-        <a href="{{ url_for('analyze') }}" class="btn-primary">Analyze Your Resume</a>
+<!-- FAQ Section -->
+<section style="padding: 4rem 2rem; background: var(--bg-primary); border-bottom: 1px solid var(--border-light);">
+    <div style="max-width: 900px; margin: 0 auto;">
+        <h2 class="section-header" style="text-align: center; margin-bottom: 3rem;">Frequently Asked Questions</h2>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <details class="card" style="cursor: pointer; padding: 1.5rem;">
+                <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer;">How accurate is the ATS score?</summary>
+                <p style="color: var(--text-secondary); margin-top: 1rem; line-height: 1.6;">Our ATS score is based on semantic similarity calculations, which are highly accurate. However, real ATS systems vary. Our score represents your best-case scenario for matching the target job description.</p>
+            </details>
+
+            <details class="card" style="cursor: pointer; padding: 1.5rem;">
+                <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer;">Is my resume data stored?</summary>
+                <p style="color: var(--text-secondary); margin-top: 1rem; line-height: 1.6;">No. All analysis happens in real-time. Your resume is processed on-the-fly and deleted immediately after analysis. We prioritize your privacy and don't store any personal data.</p>
+            </details>
+
+            <details class="card" style="cursor: pointer; padding: 1.5rem;">
+                <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer;">What file formats are supported?</summary>
+                <p style="color: var(--text-secondary); margin-top: 1rem; line-height: 1.6;">Currently, we support PDF files. We recommend saving your resume as PDF from Word or Google Docs for best results on all systems.</p>
+            </details>
+
+            <details class="card" style="cursor: pointer; padding: 1.5rem;">
+                <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer;">How long does analysis take?</summary>
+                <p style="color: var(--text-secondary); margin-top: 1rem; line-height: 1.6;">Most analyses complete in 30-60 seconds. If the AI service is experiencing high demand, it may take up to 2 minutes due to automatic retries for reliability.</p>
+            </details>
+
+            <details class="card" style="cursor: pointer; padding: 1.5rem;">
+                <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer;">Can I use the same resume for multiple jobs?</summary>
+                <p style="color: var(--text-secondary); margin-top: 1rem; line-height: 1.6;">Yes! You can analyze the same resume against different job descriptions. We recommend tailoring your resume for each position to maximize your ATS score for that specific role.</p>
+            </details>
+
+            <details class="card" style="cursor: pointer; padding: 1.5rem;">
+                <summary style="font-weight: 600; color: var(--text-primary); cursor: pointer;">What if I get a low ATS score?</summary>
+                <p style="color: var(--text-secondary); margin-top: 1rem; line-height: 1.6;">Our analysis provides specific recommendations to improve your score. Focus on adding the recommended keywords and skills, then re-analyze to track your progress and see improvement.</p>
+            </details>
+        </div>
     </div>
-</div>
+</section>
+
+<!-- CTA Section -->
+<section style="padding: 4rem 2rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1)); border-top: 1px solid var(--border-light);">
+    <div style="max-width: 700px; margin: 0 auto; text-align: center;">
+        <h2 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">Get Started Today</h2>
+        <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem;">Join thousands of job seekers who have optimized their resumes and landed interviews with our AI-powered platform.</p>
+        <a href="{{ url_for('analyze') }}" class="btn-primary btn-large" style="width: auto;">Analyze Your Resume</a>
+    </div>
+</section>
+
 {% endblock %}

@@ -2,7 +2,7 @@
 import os
 from werkzeug.utils import secure_filename
 
-ALLOWED_FORMATS = {'pdf'}
+ALLOWED_FORMATS = {'pdf', 'docx', 'doc'}
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB in bytes
 MIN_FILE_SIZE = 10 * 1024  # 10KB in bytes
 
@@ -13,7 +13,7 @@ def validate_file_format(filename: str) -> tuple[bool, str]:
     file_ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
     
     if file_ext not in ALLOWED_FORMATS:
-        return False, f"Invalid file format. Only PDF files are allowed. (Got: .{file_ext})"
+        return False, f"Invalid file format. Only PDF and DOCX files are allowed. (Got: .{file_ext})"
     
     return True, "File format valid."
 

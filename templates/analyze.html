@@ -1,482 +1,315 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<div class="page-container">
-    <div class="container wide">
-        <!-- Hero Section -->
-        <div class="hero-section" style="text-align: center; margin-bottom: 3rem;">
-            <h1>📊 Resume Analyzer</h1>
-            <p class="hero-subtitle">Optimize your resume for ATS systems and get actionable feedback to increase your chances of landing an interview.</p>
-        </div>
-
-        <!-- Analysis Form -->
-        <div class="gradient-bg-light">
-            <div class="section-header">
-                <h2 class="section-title" style="justify-content: center;">Start Your Analysis</h2>
-                <p class="section-subtitle" style="text-align: center;">Upload your resume and job description for instant ATS analysis</p>
-            </div>
-            
-            {% if error %}
-                <div style="background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem; margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center; color: #991b1b;">
-                    <span style="font-size: 1.5rem;">⚠️</span>
-                    <div><strong>Error:</strong> {{ error }}</div>
-                </div>
-            {% endif %}
-
-            <form action="/analyze" method="POST" enctype="multipart/form-data">
-                <div class="grid-2" style="margin-bottom: 2rem;">
-                    <div class="form-group">
-                        <label for="job_description"><strong>Job Description</strong></label>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Paste the complete job description you're targeting</p>
-                        <textarea id="job_description" name="job_description" rows="6" placeholder="Example: Senior Software Engineer - 5+ years experience with React, Node.js, AWS..." required>{{ job_desc if job_desc else '' }}</textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="resume"><strong>Upload Your Resume</strong></label>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">PDF format recommended for best results</p>
-                        <div style="display: flex; align-items: center; justify-content: center; padding: 2rem; border: 2px dashed var(--border-medium); border-radius: var(--radius-lg); background: var(--bg-secondary); cursor: pointer; transition: all var(--transition-fast);" onmouseover="this.style.borderColor='var(--primary)'; this.style.background='rgba(99, 102, 241, 0.05)'" onmouseout="this.style.borderColor='var(--border-medium)'; this.style.background='var(--bg-secondary)'">
-                            <input type="file" id="resume" name="resume" accept="application/pdf" required style="display: none;">
-                            <label for="resume" style="cursor: pointer; text-align: center; width: 100%;">
-                                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📄</div>
-                                <div style="font-weight: 600; color: var(--text-primary);">Click to upload</div>
-                                <div style="font-size: 0.85rem; color: var(--text-secondary);">or drag and drop</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">PDF files only (Max 5MB)</div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-primary" style="min-height: 48px;">🚀 Analyze Resume (Takes ~5 seconds)</button>
-            </form>
-        </div>
-
-    {% if score %}
-    <!-- RESULTS SECTION - FIGMA DESIGN -->
-    <div class="grid-2" style="margin-bottom: 3rem;">
-        
-        <!-- LEFT CARD: Score Display -->
-        <div class="card">
-            <div class="score-gauge-wrapper">
-                <svg width="160" height="100" viewBox="0 0 200 120" style="max-width: 100%; height: auto;">
-                    <!-- Background arc -->
-                    <path d="M 40 100 A 60 60 0 0 1 160 100" stroke="#e2e8f0" stroke-width="8" fill="none" stroke-linecap="round"/>
-                    <!-- Filled arc -->
-                    <path d="M 40 100 A 60 60 0 0 1 160 100" stroke="url(#scoreGradient)" stroke-width="8" fill="none" stroke-linecap="round" style="stroke-dasharray: {{ (score.replace('%', '') | int * 1.26) }}, 503;"/>
-                    <defs>
-                        <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color: #6366f1; stop-opacity: 1"/>
-                            <stop offset="100%" style="stop-color: #8b5cf6; stop-opacity: 1"/>
-                        </linearGradient>
-                    </defs>
-                    <text x="100" y="70" text-anchor="middle" font-size="40" font-weight="bold" fill="#1e293b">{{ score }}</text>
-                </svg>
-            </div>
-            
-            <div class="score-display">
-                <div class="score-label">ATS Match Score</div>
-                <div class="score-rating">{{ rating }}</div>
-            </div>
-        </div>
-
-        <!-- RIGHT CARD: Analysis Checklist -->
-        <div class="card" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));">
-            <h3 class="section-title" style="justify-content: flex-start;">✓ Analysis Complete</h3>
-            <div class="checklist">
-                <div class="checklist-item">
-                    <div class="checklist-icon">✓</div>
-                    <span class="checklist-text">Resume extracted & parsed</span>
-                </div>
-                <div class="checklist-item">
-                    <div class="checklist-icon">✓</div>
-                    <span class="checklist-text">Matched against job requirements</span>
-                </div>
-                <div class="checklist-item">
-                    <div class="checklist-icon">✓</div>
-                    <span class="checklist-text">Skills & experience analyzed</span>
-                </div>
-                <div class="checklist-item">
-                    <div class="checklist-icon">✓</div>
-                    <span class="checklist-text">Grammar check completed</span>
-                </div>
-                <div class="checklist-item">
-                    <div class="checklist-icon">✓</div>
-                    <span class="checklist-text">Improvement suggestions ready</span>
-                </div>
-            </div>
-        </div>
+<div style="padding: 3rem 2rem; max-width: 1400px; margin: 0 auto;">
+    {% if not score %}
+    <!-- Hero Section -->
+    <div style="text-align: center; margin-bottom: 3rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 2rem;">
+        <h1 style="font-size: 2.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">Resume Analyzer</h1>
+        <p style="font-size: 1rem; color: #6b7280;">Upload your resume and job description to get instant ATS optimization insights</p>
     </div>
 
-    <!-- Detailed Analysis Section -->
-    <div class="grid-2" style="margin-bottom: 3rem;">
-        <!-- Score Details -->
-        <div class="card">
-            <h3 class="section-title">📊 Score Breakdown</h3>
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border-light);">
-                    <span style="color: var(--text-secondary);">Percentile</span>
-                    <strong style="color: var(--text-primary);">{{ percentile }}th</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border-light);">
-                    <span style="color: var(--text-secondary);">Industry Average</span>
-                    <strong style="color: var(--text-primary);">{{ industry_avg }}%</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0;">
-                    <span style="color: var(--text-secondary);">Comparison</span>
-                    <strong style="color: {% if comparison == 'Above' %}var(--success){% else %}var(--error){% endif %};">{{ comparison }} Average</strong>
-                </div>
+    <!-- Upload Form -->
+    <form method="POST" enctype="multipart/form-data" style="background: white; border: 1px solid #e5e7eb; padding: 2.5rem; border-radius: 8px;">
+        {% if error %}
+            <div style="background: #fee2e2; border-left: 4px solid #ef4444; color: #dc2626; padding: 1rem; border-radius: 6px; margin-bottom: 2rem;">
+                <strong>Error:</strong> {{ error }}
             </div>
-        </div>
+        {% endif %}
 
-        <!-- Extracted Skills -->
-        <div class="card">
-            <h3 class="section-title" style="justify-content: flex-start;">🎯 Extracted Skills</h3>
-            <div class="skills-container">
-                {% for skill in extracted_skills[:10] %}
-                    <span class="skill-badge">{{ skill }}</span>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Matched & Missing Requirements -->
-    <div class="grid-2" style="margin-bottom: 3rem;">
-        <div class="card">
-            <h3 class="section-title" style="justify-content: flex-start;">✅ Matched Requirements</h3>
-            <ul class="list-with-icons">
-                {% for req in matched_requirements[:5] %}
-                    <li>{{ req }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div class="card">
-            <h3 class="section-title" style="justify-content: flex-start;">⚠️ Missing Skills</h3>
-            <ul class="list-with-icons warning">
-                {% for skill in missing_skills[:5] %}
-                    <li class="warning">{{ skill }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-
-    <!-- Grammar & Quality Check -->
-    {% if grammar_check and not grammar_check.get('error') %}
-    <div class="card" style="margin-bottom: 3rem;">
-        <h3 class="section-title" style="justify-content: flex-start;">✍️ Grammar & Quality Check</h3>
-        <div class="grid-3" style="gap: 1rem; margin-top: 1.5rem;">
-            <div style="padding: 1rem; background: var(--info-light); border-radius: var(--radius-lg);">
-                <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Grammar Score</div>
-                <div style="font-size: 1.5rem; font-weight: 700; color: var(--info);">{{ grammar_check.get('grammar_score', 0) }}%</div>
-            </div>
-            <div style="padding: 1rem; background: rgba(139, 92, 246, 0.1); border-radius: var(--radius-lg);">
-                <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Spelling Score</div>
-                <div style="font-size: 1.5rem; font-weight: 700; color: var(--secondary);">{{ grammar_check.get('spelling_score', 0) }}%</div>
-            </div>
-            <div style="padding: 1rem; background: var(--warning-light); border-radius: var(--radius-lg);">
-                <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Overall Quality</div>
-                <div style="font-size: 1.5rem; font-weight: 700; color: var(--warning);">{{ grammar_check.get('overall_quality_score', 0) }}%</div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-            
-            <!-- Score Gauge SVG -->
-            <svg width="200" height="120" style="display: block; margin: 0 auto 2rem; background: transparent;" viewBox="0 0 200 120">
-                <!-- Background arc -->
-                <path d="M 40 100 A 60 60 0 0 1 160 100" stroke="#e2e8f0" stroke-width="8" fill="none" stroke-linecap="round"/>
-                <!-- Filled arc based on score -->
-                <path id="scoreArc" d="M 40 100 A 60 60 0 0 1 160 100" stroke="#6366f1" stroke-width="8" fill="none" stroke-linecap="round" style="stroke-dasharray: 0, 200;"/>
-                <!-- Score point: 85% = 0.85 * 120 ≈ 102 degrees -->
-                <circle id="scorePoint" cx="145" cy="55" r="6" fill="#6366f1"/>
-            </svg>
-            
-            <!-- Score display -->
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <div style="font-size: 3rem; font-weight: 700; color: #6366f1;">{{ score }}</div>
-                <div style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem;">ATS Match Score</div>
-                <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 0.5rem 1rem; border-radius: 20px; display: inline-block; margin-top: 1rem; font-weight: 600; font-size: 0.85rem;">{{ rating }}</div>
-            </div>
-
-            <!-- Toggle Options -->
-            <div style="border-top: 1px solid #e2e8f0; padding-top: 1.5rem; margin-bottom: 1.5rem;">
-                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; color: #94a3b8; text-transform: uppercase; margin-bottom: 1rem;">Report Sections</div>
-                
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">CONTENT</span>
-                        <label style="position: relative; display: inline-block; width: 40px; height: 24px; margin: 0;">
-                            <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; border-radius: 12px; transition: 0.3s;"></span>
-                        </label>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">SECTION</span>
-                        <label style="position: relative; display: inline-block; width: 40px; height: 24px; margin: 0;">
-                            <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; border-radius: 12px; transition: 0.3s;"></span>
-                        </label>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">ATS ESSENTIALS</span>
-                        <label style="position: relative; display: inline-block; width: 40px; height: 24px; margin: 0;">
-                            <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; border-radius: 12px; transition: 0.3s;"></span>
-                        </label>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">TAILORING</span>
-                        <label style="position: relative; display: inline-block; width: 40px; height: 24px; margin: 0;">
-                            <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; border-radius: 12px; transition: 0.3s;"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Unlock Full Report Button -->
-            <button style="width: 100%; padding: 1rem; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; color: #64748b; font-weight: 600; cursor: pointer; transition: all 0.3s;" onclick="alert('Full report feature coming soon!')">Unlock Full Report</button>
-        </div>
-
-        <!-- RIGHT CARD: Analysis Steps Checklist -->
-        <div style="background: linear-gradient(135deg, #dbeafe, #ddd6fe); border-radius: 16px; padding: 2rem; min-height: 400px; display: flex; flex-direction: column; justify-content: center;">
-            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                <!-- Parsing -->
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <span style="color: white; font-weight: bold;">✓</span>
-                    </div>
-                    <span style="font-size: 1.1rem; color: #1e293b; font-weight: 500;">Parsing your resume</span>
-                </div>
-
-                <!-- Analyzing Experience -->
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <span style="color: white; font-weight: bold;">✓</span>
-                    </div>
-                    <span style="font-size: 1.1rem; color: #1e293b; font-weight: 500;">Analyzing your experience</span>
-                </div>
-
-                <!-- Extracting Skills -->
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <span style="color: white; font-weight: bold;">✓</span>
-                    </div>
-                    <span style="font-size: 1.1rem; color: #1e293b; font-weight: 500;">Extracting your skills</span>
-                </div>
-
-                <!-- Generating Recommendations -->
-                <div style="display: flex; gap: 1rem; align-items: center; opacity: 0.7;">
-                    <div style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <span style="color: #cbd5e1; font-weight: bold;"></span>
-                    </div>
-                    <span style="font-size: 1.1rem; color: #1e293b; font-weight: 500;">Generating recommendations</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- DETAILED RESULTS SECTION -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-        
-        <!-- Score Details -->
-        <div style="background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
-            <h3 style="color: #1e293b; margin-bottom: 1.5rem; font-size: 1.1rem;">📊 Score Breakdown</h3>
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #e2e8f0;">
-                    <span style="color: #64748b;">Percentile</span>
-                    <strong style="color: #1e293b;">{{ percentile }}th</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #e2e8f0;">
-                    <span style="color: #64748b;">Industry Average</span>
-                    <strong style="color: #1e293b;">{{ industry_avg }}%</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0;">
-                    <span style="color: #64748b;">Comparison</span>
-                    <strong style="color: {% if comparison == 'Above' %}#10b981{% else %}#ef4444{% endif %};">{{ comparison }} Average</strong>
-                </div>
-            </div>
-        </div>
-
-        <!-- Extracted Data -->
-        <div style="background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
-            <h3 style="color: #1e293b; margin-bottom: 1.5rem; font-size: 1.1rem;">✍️ Grammar & Quality Check</h3>
-            {% if grammar_check and not grammar_check.get('error') %}
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f0f9ff; border-radius: 8px;">
-                        <span style="color: #64748b;">Grammar Score</span>
-                        <div style="background: #6366f1; color: white; padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: 600; font-size: 0.85rem;">{{ grammar_check.get('grammar_score', 0) }}%</div>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f5f3ff; border-radius: 8px;">
-                        <span style="color: #64748b;">Spelling Score</span>
-                        <div style="background: #8b5cf6; color: white; padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: 600; font-size: 0.85rem;">{{ grammar_check.get('spelling_score', 0) }}%</div>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #fef3c7; border-radius: 8px;">
-                        <span style="color: #64748b;">Formatting Score</span>
-                        <div style="background: #f59e0b; color: white; padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: 600; font-size: 0.85rem;">{{ grammar_check.get('formatting_score', 0) }}%</div>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: linear-gradient(135deg, #f0f9ff, #f5f3ff); border-radius: 8px; font-weight: 600;">
-                        <span style="color: #1e293b;">Overall Quality</span>
-                        <div style="font-size: 1.5rem; color: #6366f1;">{{ grammar_check.get('overall_quality_score', 0) }}%</div>
-                    </div>
-                </div>
-            {% else %}
-                <div style="text-align: center; color: #94a3b8; padding: 1rem;">
-                    <p>⚠️ Unable to analyze grammar</p>
-                </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Skill Gaps -->
-    {% if skill_gaps and not skill_gaps.get('error') %}
-    <div style="background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin-bottom: 2rem;">
-        <h3 style="color: #1e293b; margin-bottom: 1.5rem; font-size: 1.1rem;">⚡ Skill Gap Analysis</h3>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem;">
-            {% if skill_gaps.get('present_skills') and skill_gaps['present_skills']|length > 0 %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+            <!-- Job Description -->
             <div>
-                <h4 style="color: #10b981; margin-bottom: 1rem; font-size: 0.95rem; font-weight: 600;">✓ Your Skills</h4>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                    {% for skill in skill_gaps['present_skills'][:8] %}
-                        <span style="background: #d1fae5; color: #065f46; padding: 0.4rem 0.8rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">{{ skill }}</span>
-                    {% endfor %}
-                </div>
+                <label style="font-weight: 600; color: #1f2937; display: block; margin-bottom: 0.75rem;">Job Description</label>
+                <textarea name="job_description" required placeholder="Paste the job description here..."
+                    style="width: 100%; height: 200px; padding: 1rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem; font-family: inherit; resize: vertical;">{{ job_desc if job_desc else '' }}</textarea>
             </div>
-            {% endif %}
 
-            {% if skill_gaps.get('missing_skills') and skill_gaps['missing_skills']|length > 0 %}
+            <!-- Resume Upload -->
             <div>
-                <h4 style="color: #ef4444; margin-bottom: 1rem; font-size: 0.95rem; font-weight: 600;">✗ Missing Skills</h4>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                    {% for skill in skill_gaps['missing_skills'][:8] %}
-                        <span style="background: #fee2e2; color: #991b1b; padding: 0.4rem 0.8rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">{{ skill }}</span>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            {% if skill_gaps.get('required_skills') and skill_gaps['required_skills']|length > 0 %}
-            <div>
-                <h4 style="color: #8b5cf6; margin-bottom: 1rem; font-size: 0.95rem; font-weight: 600;">🎯 Job Requirements</h4>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                    {% for skill in skill_gaps['required_skills'][:8] %}
-                        <span style="background: #f3e8ff; color: #6b21a8; padding: 0.4rem 0.8rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">{{ skill }}</span>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Improvement Suggestions with Detailed Grammar Feedback -->
-    <div style="background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin-bottom: 2rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h3 style="color: #1e293b; font-size: 1.1rem; margin: 0;">💡 Detailed Improvement Suggestions</h3>
-            <button class="btn-secondary" onclick="exportAs('pdf')" style="padding: 0.5rem 1rem; font-size: 0.9rem;">📄 Export PDF</button>
-        </div>
-        
-        {% if grammar_check and grammar_check.get('improvements') and grammar_check['improvements']|length > 0 %}
-            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                {% for improvement in grammar_check['improvements'] %}
-                <div style="border-left: 4px solid 
-                    {% if improvement.get('type') == 'grammar' %}#6366f1
-                    {% elif improvement.get('type') == 'spelling' %}#8b5cf6
-                    {% elif improvement.get('type') == 'formatting' %}#f59e0b
-                    {% else %}#10b981{% endif %};
-                    background: #f8fafc; padding: 1.25rem; border-radius: 6px;">
-                    
-                    <div style="display: flex; align-items: start; gap: 1rem;">
-                        <div style="background: 
-                            {% if improvement.get('type') == 'grammar' %}#e0e7ff
-                            {% elif improvement.get('type') == 'spelling' %}#f3e8ff
-                            {% elif improvement.get('type') == 'formatting' %}#fef3c7
-                            {% else %}#d1fae5{% endif %};
-                            padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: 
-                            {% if improvement.get('type') == 'grammar' %}#4f46e5
-                            {% elif improvement.get('type') == 'spelling' %}#7c3aed
-                            {% elif improvement.get('type') == 'formatting' %}#d97706
-                            {% else %}#059669{% endif %};">
-                            {{ improvement.get('type', 'tip') }}
-                        </div>
-                        <div style="flex: 1;">
-                            <h4 style="color: #1e293b; margin: 0 0 0.5rem 0; font-size: 0.95rem;">
-                                {% if improvement.get('issue') %}{{ improvement['issue'] }}{% else %}Improvement needed{% endif %}
-                            </h4>
-                            {% if improvement.get('location') %}
-                            <p style="font-size: 0.85rem; color: #64748b; margin: 0.25rem 0;">
-                                <strong>Where:</strong> {{ improvement['location'] }}
-                            </p>
-                            {% endif %}
-                            {% if improvement.get('fix') %}
-                            <p style="font-size: 0.85rem; color: #1e293b; margin: 0.5rem 0 0 0; padding: 0.75rem; background: #fafafa; border-radius: 4px; border-left: 3px solid #10b981;">
-                                <strong>How to fix:</strong> {{ improvement['fix'] }}
-                            </p>
-                            {% endif %}
-                        </div>
+                <label style="font-weight: 600; color: #1f2937; display: block; margin-bottom: 0.75rem;">Upload Resume</label>
+                <div style="border: 2px dashed #d1d5db; padding: 2.5rem; border-radius: 6px; text-align: center; background: #f9fafb; cursor: pointer;" 
+                     onmouseover="this.style.borderColor='#9ca3af'; this.style.background='#f3f4f6';" 
+                     onmouseout="this.style.borderColor='#d1d5db'; this.style.background='#f9fafb';">
+                    <input type="file" id="resume" name="resume" accept=".pdf,.docx,.doc,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required style="display: none;" 
+                           onchange="document.getElementById('fileName').textContent = this.files[0].name; document.getElementById('uploadStatus').style.display='block';">
+                    <label for="resume" style="cursor: pointer; display: block;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">Docs</div>
+                        <strong style="color: #1f2937;">Click to upload resume</strong>
+                        <p style="color: #6b7280; font-size: 0.85rem; margin-top: 0.5rem;">PDF, DOCX, or DOC format</p>
+                    </label>
+                    <div id="uploadStatus" style="display: none; margin-top: 1rem; padding: 0.75rem; background: #d1fae5; color: #065f46; border-radius: 4px; font-size: 0.9rem;">
+                        File selected: <span id="fileName" style="font-weight: 600;"></span>
                     </div>
                 </div>
-                {% endfor %}
             </div>
-        {% elif feedback and feedback|length > 0 %}
-            <div>
-                {% for suggestion in feedback %}
-                <div style="background: #f8fafc; padding: 1rem; border-left: 4px solid #6366f1; border-radius: 4px; margin-bottom: 0.75rem;">
-                    <p style="color: #1e293b; margin: 0;">{{ suggestion }}</p>
+        </div>
+
+        <button type="submit" style="background: #6366f1; color: white; padding: 1rem; border: none; border-radius: 6px; font-weight: 600; width: 100%; cursor: pointer; font-size: 1rem;">
+            Analyze Resume (Takes ~5 seconds)
+        </button>
+    </form>
+
+    {% else %}
+    <!-- Results Section -->
+    <div style="text-align: center; margin-bottom: 2rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 2rem;">
+        <div style="font-size: 3.5rem; font-weight: 700; color: #6366f1; margin-bottom: 0.5rem;">{{ score }}</div>
+        <div style="font-size: 1rem; color: #6b7280;">ATS Match Score</div>
+    </div>
+
+    <!-- Metrics Grid -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+        <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; text-align: center;">
+            <div style="font-size: 2rem; font-weight: 700; color: #6366f1;">{{ percentile }}th</div>
+            <div style="color: #6b7280; font-size: 0.9rem;">Percentile</div>
+        </div>
+        <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; text-align: center;">
+            <div style="font-size: 2rem; font-weight: 700; color: #6366f1;">{{ industry_avg }}%</div>
+            <div style="color: #6b7280; font-size: 0.9rem;">Industry Average</div>
+        </div>
+        <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; text-align: center;">
+            <div style="font-size: 2rem; font-weight: 700; color: {% if comparison == 'Above' %}#10b981{% else %}#ef4444{% endif %};">{{ comparison }}</div>
+            <div style="color: #6b7280; font-size: 0.9rem;">vs Average</div>
+        </div>
+    </div>
+
+    <!-- Your Information -->
+    <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #1f2937; font-weight: 600;">Your Information</h3>
+        {% if data %}
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                <div style="padding: 0.75rem; background: #f9fafb; border-left: 2px solid #6366f1; border-radius: 4px;">
+                    <div style="font-size: 0.8rem; color: #6b7280;">Name</div>
+                    <div style="font-weight: 600; color: #1f2937;">{{ data.get('name') if data.get('name') else 'Not found' }}</div>
                 </div>
-                {% endfor %}
+                <div style="padding: 0.75rem; background: #f9fafb; border-left: 2px solid #6366f1; border-radius: 4px;">
+                    <div style="font-size: 0.8rem; color: #6b7280;">Email</div>
+                    <div style="font-weight: 600; color: #6366f1;">{{ data.get('email') if data.get('email') else 'Not found' }}</div>
+                </div>
+                <div style="padding: 0.75rem; background: #f9fafb; border-left: 2px solid #6366f1; border-radius: 4px;">
+                    <div style="font-size: 0.8rem; color: #6b7280;">Experience</div>
+                    <div style="font-weight: 600; color: #1f2937;">
+                        {% set exp = data.get('years_of_experience') %}
+                        {% if exp and exp > 0 %}{{ exp }} year{% if exp != 1 %}s{% endif %}{% else %}Not found{% endif %}
+                    </div>
+                </div>
             </div>
         {% else %}
-            <div style="text-align: center; padding: 2rem; color: #94a3b8;">
-                <p>💭 Generating recommendations...</p>
+            <div style="padding: 1rem; background: #f9fafb; border-radius: 4px; color: #6b7280; text-align: center;">
+                No information extracted from resume
             </div>
+        {% endif %}
+    </div>
+
+    <!-- Skills -->
+    {% if data and data.get('skills') %}
+    <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #1f2937; font-weight: 600;">Your Skills</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+            {% for skill in data['skills'] %}{% if loop.index <= 15 %}
+            <span style="display: inline-block; padding: 0.5rem 1rem; background: #f0f4ff; color: #6366f1; border: 1px solid #c7d2fe; border-radius: 20px; font-size: 0.9rem;">{{ skill }}</span>
+            {% endif %}{% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Strengths -->
+    {% if feedback %}
+    <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #1f2937; font-weight: 600;">Strengths</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            {% for item in feedback %}{% if loop.index <= 5 %}
+            <div style="padding: 0.75rem 1rem; background: #ecfdf5; border-left: 2px solid #10b981; border-radius: 4px; color: #047857; font-size: 0.9rem;">{{ item }}</div>
+            {% endif %}{% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Skill Gap Analysis -->
+    {% if skill_gaps %}
+    <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; color: #1f2937; font-weight: 600;">Skill Gap Analysis</h3>
+        
+        {% if skill_gaps.present_skills %}
+        <div style="margin-bottom: 1.5rem;">
+            <h4 style="font-weight: 600; color: #10b981; margin-bottom: 0.75rem; font-size: 0.9rem;">Your Present Skills</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                {% for skill in skill_gaps.present_skills %}
+                <span style="display: inline-block; padding: 0.4rem 0.8rem; background: #ecfdf5; color: #047857; border-radius: 16px; font-size: 0.85rem; border: 1px solid #d1fae5;">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if skill_gaps.required_skills %}
+        <div style="margin-bottom: 1.5rem;">
+            <h4 style="font-weight: 600; color: #6366f1; margin-bottom: 0.75rem; font-size: 0.9rem;">Required Skills</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                {% for skill in skill_gaps.required_skills %}
+                <span style="display: inline-block; padding: 0.4rem 0.8rem; background: #f0f4ff; color: #6366f1; border-radius: 16px; font-size: 0.85rem; border: 1px solid #c7d2fe;">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if skill_gaps.missing_skills %}
+        <div>
+            <h4 style="font-weight: 600; color: #ef4444; margin-bottom: 0.75rem; font-size: 0.9rem;">Missing Skills (Priority)</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                {% for skill in skill_gaps.missing_skills %}
+                <span style="display: inline-block; padding: 0.4rem 0.8rem; background: #fef2f2; color: #991b1b; border-radius: 16px; font-size: 0.85rem; border: 1px solid #fecaca;">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
         {% endif %}
     </div>
     {% endif %}
 
+    <!-- Grammar & Quality Check -->
+    {% if grammar_check %}
+    <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; color: #1f2937; font-weight: 600;">Grammar & Quality Check</h3>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+            <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 6px;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: #6366f1;">{{ grammar_check.get('grammar_score', 0) }}%</div>
+                <div style="color: #6b7280; font-size: 0.8rem;">Grammar</div>
+            </div>
+            <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 6px;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: #6366f1;">{{ grammar_check.get('spelling_score', 0) }}%</div>
+                <div style="color: #6b7280; font-size: 0.8rem;">Spelling</div>
+            </div>
+            <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 6px;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: #6366f1;">{{ grammar_check.get('overall_quality_score', 0) }}%</div>
+                <div style="color: #6b7280; font-size: 0.8rem;">Quality</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Improvement Suggestions -->
+    {% if feedback %}
+    <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; color: #1f2937; font-weight: 600;">Improvement Suggestions</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            {% for rec in feedback %}
+            {% if loop.index <= 10 %}
+            <div style="padding: 0.75rem 1rem; background: #fffbeb; border-left: 2px solid #f59e0b; border-radius: 4px; color: #92400e; font-size: 0.9rem;">{{ rec }}</div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Contact Information -->
+    {% if contact_info %}
+    <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #1f2937; font-weight: 600;">Contact Information</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+            {% if contact_info.get('phone') %}<div style="padding: 0.5rem 0.75rem; background: #f0f4ff; border-radius: 4px; font-size: 0.85rem;"><strong>Phone:</strong> {{ contact_info['phone'] }}</div>{% endif %}
+            {% if contact_info.get('email') %}<div style="padding: 0.5rem 0.75rem; background: #f0f4ff; border-radius: 4px; font-size: 0.85rem;"><strong>LinkedIn:</strong> {{ contact_info['email'] }}</div>{% endif %}
+            {% if contact_info.get('github') %}<div style="padding: 0.5rem 0.75rem; background: #f0f4ff; border-radius: 4px; font-size: 0.85rem;"><strong>GitHub:</strong> {{ contact_info['github'] }}</div>{% endif %}
+            {% if contact_info.get('website') %}<div style="padding: 0.5rem 0.75rem; background: #f0f4ff; border-radius: 4px; font-size: 0.85rem;"><strong>Website:</strong> {{ contact_info['website'] }}</div>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Education -->
+    {% if education %}
+    <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #1f2937; font-weight: 600;">Education</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            {% for edu in education %}
+            <div style="padding: 0.5rem 0.75rem; background: #f0f4ff; border-left: 2px solid #6366f1; border-radius: 4px; font-size: 0.9rem;">{{ edu }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Work Experience -->
+    {% if work_experience %}
+    <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #1f2937; font-weight: 600;">Work Experience</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            {% for exp in work_experience %}
+            <div style="padding: 0.5rem 0.75rem; background: #f0f4ff; border-left: 2px solid #6366f1; border-radius: 4px; font-size: 0.9rem;">{{ exp }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Keyword Match Score -->
+    {% if matched_keywords %}
+    <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #1f2937; font-weight: 600;">Job Keywords Found ({{ matched_keywords|length }})</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            {% for keyword in matched_keywords %}
+            <span style="display: inline-block; padding: 0.35rem 0.75rem; background: #d1fae5; color: #047857; border-radius: 16px; font-size: 0.75rem; border: 1px solid #a7f3d0;">{{ keyword }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ATS Compliance -->
+    {% if ats_compliance %}
+    <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #1f2937; font-weight: 600;">ATS Compliance Score</h3>
+        <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+            <div style="flex: 1; background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                <div style="width: {{ ats_compliance.get('score', 0) }}%; height: 100%; background: {% if ats_compliance.get('score', 0) >= 80 %}#10b981{% elif ats_compliance.get('score', 0) >= 60 %}#f59e0b{% else %}#ef4444{% endif %};"></div>
+            </div>
+            <div style="font-size: 1.2rem; font-weight: 700; color: #1f2937; min-width: 50px;">{{ ats_compliance.get('score', 0) }}%</div>
+        </div>
+        {% if ats_compliance.get('issues') %}
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            {% for issue in ats_compliance['issues'] %}
+            <div style="padding: 0.5rem 0.75rem; background: #fef2f2; border-left: 2px solid #ef4444; border-radius: 4px; font-size: 0.85rem; color: #991b1b;">{{ issue }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Writing Quality Metrics -->
+    <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; color: #1f2937; font-weight: 600;">Writing Quality Metrics</h3>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+            <!-- Action Verbs Score -->
+            {% if action_verbs %}
+            <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 6px;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: #6366f1;">{{ action_verbs.get('score', 0) }}%</div>
+                <div style="color: #6b7280; font-size: 0.8rem;">Action Verbs</div>
+                <div style="font-size: 0.7rem; color: #9ca3af; margin-top: 0.25rem;">{{ action_verbs.get('total_count', 0) }} found</div>
+            </div>
+            {% endif %}
+            
+            <!-- Quantification Score -->
+            {% if quantification %}
+            <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 6px;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: #6366f1;">{{ quantification.get('score', 0) }}%</div>
+                <div style="color: #6b7280; font-size: 0.8rem;">Quantification</div>
+                <div style="font-size: 0.7rem; color: #9ca3af; margin-top: 0.25rem;">{{ quantification.get('quantified_bullets', 0) }}/{{ quantification.get('total_bullets', 0) }}</div>
+            </div>
+            {% endif %}
+            
+            <!-- Length Score -->
+            {% if length_format %}
+            <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 6px;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: #6366f1;">{{ length_format.get('length_score', 0) }}%</div>
+                <div style="color: #6b7280; font-size: 0.8rem;">Length Score</div>
+                <div style="font-size: 0.7rem; color: #9ca3af; margin-top: 0.25rem;">{{ length_format.get('word_count', 0) }} words</div>
+            </div>
+            {% endif %}
+        </div>
+        {% if length_format and length_format.get('message') %}
+        <div style="margin-top: 1rem; padding: 0.75rem; background: #e0e7ff; border-left: 2px solid #6366f1; border-radius: 4px; font-size: 0.85rem; color: #3730a3;">{{ length_format['message'] }}</div>
+        {% endif %}
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap;">
+        <a href="{{ url_for('template_generation') }}" style="padding: 0.75rem 1.5rem; background: #6366f1; color: white; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block;">Template</a>
+        <a href="{{ url_for('export_analysis', format='pdf') }}" style="padding: 0.75rem 1.5rem; background: white; color: #6366f1; border: 1px solid #6366f1; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block;">PDF</a>
+        <a href="{{ url_for('analyze') }}" style="padding: 0.75rem 1.5rem; background: white; color: #6366f1; border: 1px solid #6366f1; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block;">Retry</a>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
-
-<script>
-// Score gauge animation
-function animateGauge() {
-    const scoreText = "{{ score }}".replace('%', '');
-    const percentage = parseInt(scoreText) / 100;
-    const arcLength = 120 * percentage;
-    const arc = document.getElementById('scoreArc');
-    if (arc) {
-        arc.style.strokeDasharray = arcLength + ', 200';
-    }
-}
-
-// Export function
-function exportAs(format) {
-    const analysisData = {
-        score: "{{ score }}",
-        rating: "{{ rating }}",
-        percentile: {{ percentile }},
-        industry_average: {{ industry_avg }},
-        comparison: "{{ comparison }}",
-        data: {{ data | tojson }},
-        feedback: {{ feedback | tojson }},
-        skill_gaps: {{ skill_gaps | tojson }}
-    };
-    
-    fetch(`/export/${format}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(analysisData)
-    })
-    .then(response => response.blob())
-    .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `resume_analysis.${format}`;
-        a.click();
-    });
-}
-
-// Run animations on load
-setTimeout(animateGauge, 100);
-</script>

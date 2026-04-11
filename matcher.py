@@ -4,9 +4,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
 def calculate_semantic_match(resume_text: str, job_description: str) -> float:
-    """
-    Calculates the ATS match score using Cosine Similarity between vector embeddings.
-    """
     if not resume_text or not job_description:
         return 0.0
 
@@ -21,7 +18,6 @@ def calculate_semantic_match(resume_text: str, job_description: str) -> float:
     return percentage_score
 
 def benchmark_score(score: float) -> dict:
-    """Benchmarks a score against industry standards and returns performance data."""
     benchmarks = {
         "industry_average": 72.0,
         "excellent_threshold": 85.0,

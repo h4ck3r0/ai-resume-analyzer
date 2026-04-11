@@ -10,21 +10,87 @@
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <a href="{{ url_for('home') }}">
-                    <span class="logo-icon">📄</span> AI Resume Pro
-                </a>
-            </div>
-            <ul class="nav-links">
-                <li><a href="{{ url_for('home') }}">Home</a></li>
-                <li><a href="{{ url_for('analyze') }}" class="nav-btn">Analyzer</a></li>
-                <li><a href="{{ url_for('template_generation') }}" class="nav-btn">Template</a></li>
-                <li><a href="{{ url_for('about') }}">About</a></li>
+    <nav class="navbar" style="padding: 1rem 2rem; background: var(--bg-primary); border-bottom: 1px solid var(--border-light); position: sticky; top: 0; z-index: 100;">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+            <!-- Logo -->
+            <a href="{{ url_for('home') }}" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; font-weight: 800; font-size: 1.25rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                <span style="font-size: 1.5rem;">📄</span> AI Resume Pro
+            </a>
+
+            <!-- Desktop Navigation -->
+            <ul style="display: none; list-style: none; margin: 0; padding: 0; gap: 2rem; align-items: center;" class="nav-links-desktop">
+                <li><a href="{{ url_for('home') }}" style="text-decoration: none; color: var(--text-secondary); font-weight: 500; transition: color var(--transition-fast);" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-secondary)'">Home</a></li>
+                <li><a href="{{ url_for('analyze') }}" style="text-decoration: none; color: var(--text-secondary); font-weight: 500; transition: color var(--transition-fast);" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-secondary)'">Analyzer</a></li>
+                <li><a href="{{ url_for('template_generation') }}" style="text-decoration: none; color: var(--text-secondary); font-weight: 500; transition: color var(--transition-fast);" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-secondary)'">Template</a></li>
+                <li><a href="{{ url_for('about') }}" style="text-decoration: none; color: var(--text-secondary); font-weight: 500; transition: color var(--transition-fast);" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-secondary)'">About</a></li>
+            </ul>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobileMenuBtn" style="display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 0.5rem; color: var(--text-primary); transition: transform var(--transition-fast);" class="mobile-menu-btn">☰</button>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobileMenu" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border-bottom: 1px solid var(--border-light); box-shadow: 0 8px 16px rgba(0,0,0,0.1);" class="mobile-menu">
+            <ul style="list-style: none; margin: 0; padding: 1rem 2rem; display: flex; flex-direction: column; gap: 1rem;">
+                <li><a href="{{ url_for('home') }}" style="text-decoration: none; color: var(--text-primary); font-weight: 500; display: block; padding: 0.75rem 0;">Home</a></li>
+                <li><a href="{{ url_for('analyze') }}" style="text-decoration: none; color: var(--text-primary); font-weight: 500; display: block; padding: 0.75rem 0;">Analyzer</a></li>
+                <li><a href="{{ url_for('template_generation') }}" style="text-decoration: none; color: var(--text-primary); font-weight: 500; display: block; padding: 0.75rem 0;">Template</a></li>
+                <li><a href="{{ url_for('about') }}" style="text-decoration: none; color: var(--text-primary); font-weight: 500; display: block; padding: 0.75rem 0;">About</a></li>
             </ul>
         </div>
     </nav>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const navDesktop = document.querySelector('.nav-links-desktop');
+
+        // Show/hide mobile menu button based on screen size
+        function handleResize() {
+            if (window.innerWidth > 768) {
+                mobileMenuBtn.style.display = 'none';
+                navDesktop.style.display = 'flex';
+                mobileMenu.style.display = 'none';
+            } else {
+                mobileMenuBtn.style.display = 'block';
+                navDesktop.style.display = 'none';
+            }
+        }
+
+        // Initial setup
+        handleResize();
+        window.addEventListener('resize', handleResize);
+
+        // Toggle mobile menu
+        mobileMenuBtn.addEventListener('click', function() {
+            if (mobileMenu.style.display === 'none') {
+                mobileMenu.style.display = 'block';
+                mobileMenuBtn.style.transform = 'rotate(90deg)';
+            } else {
+                mobileMenu.style.display = 'none';
+                mobileMenuBtn.style.transform = 'rotate(0deg)';
+            }
+        });
+
+        // Close menu when a link is clicked
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenu.style.display = 'none';
+                mobileMenuBtn.style.transform = 'rotate(0deg)';
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const isClickInside = mobileMenuBtn.contains(event.target) || mobileMenu.contains(event.target);
+            if (!isClickInside && mobileMenu.style.display === 'block') {
+                mobileMenu.style.display = 'none';
+                mobileMenuBtn.style.transform = 'rotate(0deg)';
+            }
+        });
+    </script>
 
     <main class="page-container fade-in">
         {% block content %}

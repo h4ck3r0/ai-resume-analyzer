@@ -160,3 +160,104 @@ def export_to_pdf(analysis_data: dict) -> bytes:
     doc.build(story)
     buffer.seek(0)
     return buffer.getvalue()
+
+def export_template_to_csv(template_data: dict) -> str:
+    """Export template to CSV format."""
+    output = StringIO()
+    writer = csv.writer(output)
+    
+    writer.writerow(["Resume Template Generator - Export"])
+    writer.writerow(["Generated:", template_data.get("timestamp", "N/A")])
+    writer.writerow([])
+    
+    writer.writerow(["PROFESSIONAL SUMMARY"])
+    writer.writerow([template_data.get("summary", "")])
+    writer.writerow([])
+    
+    writer.writerow(["KEY RESUME SECTIONS"])
+    sections = template_data.get("sections", [])
+    for section in sections:
+        writer.writerow([section])
+    writer.writerow([])
+    
+    writer.writerow(["SUGGESTED ACHIEVEMENT BULLETS"])
+    bullets = template_data.get("bullets", [])
+    for i, bullet in enumerate(bullets, 1):
+        writer.writerow([f"Bullet {i}", bullet])
+    writer.writerow([])
+    
+    writer.writerow(["RECOMMENDED SKILLS"])
+    skills = template_data.get("recommended_skills", [])
+    for skill in skills:
+        writer.writerow([skill])
+    writer.writerow([])
+    
+    writer.writerow(["COVER LETTER OPENING"])
+    writer.writerow([template_data.get("cover_letter", "")])
+    
+    return output.getvalue()
+
+def export_template_to_pdf(template_data: dict) -> bytes:
+    """Export template to PDF format."""
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    story = []
+    styles = getSampleStyleSheet()
+    
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=22,
+        textColor=colors.HexColor('#667eea'),
+        spaceAfter=20,
+        spaceBefore=12
+    )
+    
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        fontSize=13,
+        textColor=colors.HexColor('#764ba2'),
+        spaceAfter=10,
+        spaceBefore=10,
+        borderPadding=5
+    )
+    
+    story.append(Paragraph("Resume Template - Ready to Customize", title_style))
+    story.append(Spacer(1, 0.2 * inch))
+    
+    # Professional Summary
+    story.append(Paragraph("Professional Summary", heading_style))
+    summary = template_data.get("summary", "")
+    story.append(Paragraph(summary if summary else "Add your professional summary here.", styles['Normal']))
+    story.append(Spacer(1, 0.2 * inch))
+    
+    # Key Sections
+    story.append(Paragraph("Key Resume Sections", heading_style))
+    sections = template_data.get("sections", [])
+    for section in sections:
+        story.append(Paragraph(f"• {section}", styles['Normal']))
+    story.append(Spacer(1, 0.2 * inch))
+    
+    # Achievement Bullets
+    story.append(Paragraph("Suggested Achievement Bullets", heading_style))
+    bullets = template_data.get("bullets", [])
+    for bullet in bullets:
+        story.append(Paragraph(f"✓ {bullet}", styles['Normal']))
+    story.append(Spacer(1, 0.2 * inch))
+    
+    # Recommended Skills
+    story.append(Paragraph("Recommended Skills", heading_style))
+    skills = template_data.get("recommended_skills", [])
+    skills_text = ", ".join(skills) if skills else "N/A"
+    story.append(Paragraph(skills_text, styles['Normal']))
+    story.append(Spacer(1, 0.2 * inch))
+    
+    # Cover Letter Opening
+    story.append(Paragraph("Cover Letter Opening", heading_style))
+    cover_letter = template_data.get("cover_letter", "")
+    story.append(Paragraph(cover_letter if cover_letter else "Add your cover letter here.", styles['Normal']))
+    
+    doc.build(story)
+    buffer.seek(0)
+    return buffer.getvalue()

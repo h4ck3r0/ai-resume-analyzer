@@ -1,6 +1,7 @@
 import pdfplumber
 import json
 import os
+import re
 import time
 from dotenv import load_dotenv
 from google import genai
@@ -14,7 +15,6 @@ except Exception as e:
     pass
 
 def _call_gemini_with_retry(prompt: str, max_retries: int = 3) -> str:
-    """Helper function to call Gemini API with retry logic for handling rate limits."""
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
@@ -33,7 +33,6 @@ def _call_gemini_with_retry(prompt: str, max_retries: int = 3) -> str:
     return None
 
 def extract_text_from_pdf(pdf_path: str) -> str:
-    """Reads a PDF file and extracts all raw text."""
     text = ""
     try:
         with pdfplumber.open(pdf_path) as pdf:
@@ -45,11 +44,93 @@ def extract_text_from_pdf(pdf_path: str) -> str:
         return f"Error reading PDF: {str(e)}"
     return text
 
+
+def extract_text_from_docx(docx_path: str) -> str:
+    """Extract text from DOCX files."""
+    text = ""
+    try:
+        from docx import Document
+        doc = Document(docx_path)
+        for para in doc.paragraphs:
+            if para.text.strip():
+                text += para.text + "\n"
+        for table in doc.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    if cell.text.strip():
+                        text += cell.text + "\n"
+    except ImportError:
+        return "Error: python-docx library not installed. Please install it to support DOCX files."
+    except Exception as e:
+        return f"Error reading DOCX: {str(e)}"
+    return text
+
+
+def extract_resume_text(file_path: str) -> str:
+   
+    if not file_path:
+        return "Error: No file path provided"
+    
+    file_ext = file_path.rsplit('.', 1)[-1].lower() if '.' in file_path else ''
+    
+    if file_ext == 'pdf':
+        return extract_text_from_pdf(file_path)
+    elif file_ext in ('docx', 'doc'):
+        return extract_text_from_docx(file_path)
+    else:
+        return f"Error: Unsupported file format: .{file_ext}"
+
+def _extract_name_from_text(text: str) -> str:
+   
+    if not text:
+        return None
+    
+    lines = text.strip().split('\n')
+   
+    for line in lines:
+        line = line.strip()
+        # Skip lines that are obviously not names (too long, all caps headers, etc)
+        if len(line) > 50 or line.isupper():
+            continue
+        # Skip lines with email or special characters
+        if '@' in line or '(' in line or ')' in line:
+            continue
+        # First substantial line is likely the name
+        if len(line) > 2 and len(line.split()) <= 4:
+            return line
+    return None
+
+
+def _extract_email_from_text(text: str) -> str:
+    """Extract email from resume text."""
+    if not text:
+        return None
+    email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', text)
+    return email_match.group() if email_match else None
+
+
+def _extract_years_experience_from_text(text: str) -> int:
+    """Extract years of experience from resume text."""
+    if not text:
+        return 0
+    
+    experience_matches = re.findall(r'(\d+)\+?\s*(?:years?|yrs?)\s+(?:of\s+)?(?:experience|exp)', text.lower())
+    if experience_matches:
+        # Return the maximum found (usually most relevant)
+        return max(int(x) for x in experience_matches)
+    
+    exp_match = re.search(r'(\d+)\s+years?\s+(?:of\s+)?(?:professional\s+)?experience', text.lower())
+    if exp_match:
+        return int(exp_match.group(1))
+    
+    return 0
+
+
 def parse_resume_with_llm(text: str) -> dict:
-    """Sends the raw text to the Gemini API to extract structured entities."""
     prompt = f"""
     You are an expert technical recruiter. Extract the following information from the resume text below.
     Output ONLY a valid JSON object with the exact keys: "Name", "Email", "Skills" (list of strings), and "Total_Years_Experience" (integer).
+    If any field is not found, use null for Name/Email, empty list for Skills, and 0 for Total_Years_Experience.
     
     Resume Text:
     {text}
@@ -57,11 +138,45 @@ def parse_resume_with_llm(text: str) -> dict:
     try:
         response_text = _call_gemini_with_retry(prompt)
         if response_text:
-            return json.loads(response_text)
+            parsed = json.loads(response_text)
+            result = {
+                'Name': parsed.get('Name'),
+                'Email': parsed.get('Email'),
+                'Skills': parsed.get('Skills', []),
+                'Total_Years_Experience': parsed.get('Total_Years_Experience', 0)
+            }
+            # Use fallback extraction if LLM didn't find key data
+            if not result['Name']:
+                result['Name'] = _extract_name_from_text(text)
+            if not result['Email']:
+                result['Email'] = _extract_email_from_text(text)
+            if not result['Total_Years_Experience']:
+                result['Total_Years_Experience'] = _extract_years_experience_from_text(text)
+            return result
         else:
-            return {"error": "API unavailable. Please try again."}
+           
+            return {
+                'Name': _extract_name_from_text(text),
+                'Email': _extract_email_from_text(text),
+                'Skills': [],
+                'Total_Years_Experience': _extract_years_experience_from_text(text)
+            }
+    except json.JSONDecodeError as e:
+      
+        return {
+            'Name': _extract_name_from_text(text),
+            'Email': _extract_email_from_text(text),
+            'Skills': [],
+            'Total_Years_Experience': _extract_years_experience_from_text(text)
+        }
     except Exception as e:
-        return {"error": f"Could not extract resume information"}
+        
+        return {
+            'Name': _extract_name_from_text(text),
+            'Email': _extract_email_from_text(text),
+            'Skills': [],
+            'Total_Years_Experience': _extract_years_experience_from_text(text)
+        }
 
 def generate_feedback(resume_text: str, job_description: str) -> dict:
     prompt = f"""
@@ -95,7 +210,6 @@ def generate_feedback(resume_text: str, job_description: str) -> dict:
         return {"improvements": ["Add more achievement-oriented descriptions", "Include relevant technical skills", "Highlight measurable results and impact", "Use action verbs and keywords from job posting", "Format consistently for ATS compatibility"]}
 
 def generate_template(job_description: str) -> dict:
-    """Generate resume content template suggestions based on job description."""
     prompt = f"""
     Act as an expert resume writer. Based on the job description provided, generate a resume template with suggested sections and content.
     Output ONLY a valid JSON object with these EXACT keys: 
@@ -112,7 +226,6 @@ def generate_template(job_description: str) -> dict:
         response_text = _call_gemini_with_retry(prompt)
         if response_text:
             result = json.loads(response_text)
-            # Validate response has required fields
             if "summary" in result and "key_sections" in result and "suggested_bullets" in result:
                 if result["key_sections"] and result["suggested_bullets"]:
                     return result
@@ -126,17 +239,14 @@ def generate_template(job_description: str) -> dict:
 
 
 def _generate_template_fallback(job_description: str) -> dict:
-    """Fallback template generation with smart suggestions."""
-    # Extract key information from job description
     jd_keywords = job_description.lower().split()
     
-    # Determine seniority level
+
     is_senior = any(word in job_description.lower() for word in ["senior", "lead", "manager", "principal", "architect"])
     is_junior = any(word in job_description.lower() for word in ["junior", "entry", "graduate", "intern"])
     
     years_match = [w for w in jd_keywords if '+' in w and 'year' in job_description.lower()]
     
-    # Smart summary based on role
     if is_senior:
         summary = f"Results-driven professional with proven expertise in leading technical initiatives and delivering enterprise software solutions. Demonstrated success in building high-performing teams and driving organizational growth through innovation and strategic planning."
     elif is_junior:
@@ -144,7 +254,6 @@ def _generate_template_fallback(job_description: str) -> dict:
     else:
         summary = f"Experienced professional with expertise in software development, team collaboration, and delivering high-quality solutions. Committed to continuous learning and driving technical excellence across cross-functional initiatives."
     
-    # Suggest relevant sections
     key_sections = [
         "Professional Summary",
         "Technical Skills",
@@ -153,7 +262,6 @@ def _generate_template_fallback(job_description: str) -> dict:
         "Certifications & Achievements"
     ]
     
-    # Industry-specific bullets
     if any(word in job_description.lower() for word in ["data", "analytics", "database"]):
         suggested_bullets = [
             "Developed and optimized data pipelines processing 100K+ records daily, improving query performance by 40%",
@@ -179,7 +287,6 @@ def _generate_template_fallback(job_description: str) -> dict:
             "Mentored team of 4 frontend developers on best practices and code quality standards"
         ]
     else:
-        # Generic professional bullets
         suggested_bullets = [
             "Led development of mission-critical features delivering 30% improvement in user engagement",
             "Architected scalable solutions supporting 10x business growth with 99.9% uptime",
@@ -195,7 +302,6 @@ def _generate_template_fallback(job_description: str) -> dict:
     }
 
 def analyze_skill_gaps(resume_text: str, job_description: str) -> dict:
-    """Analyze specific skill gaps between resume and job description."""
     prompt = f"""
     Act as an expert technical recruiter. Analyze the EXACT skills between the candidate's resume and the job requirements.
     Extract and compare specific technical and professional skills.
