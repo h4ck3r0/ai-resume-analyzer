@@ -47,7 +47,7 @@ def export_to_csv(analysis_data: dict) -> str:
         writer.writerow(["Missing Skills", ", ".join(skill_gaps.get("missing_skills", []))])
         writer.writerow([])
     
-    # Feedback
+
     feedback = analysis_data.get("feedback", [])
     if feedback:
         writer.writerow(["Improvement Suggestions"])

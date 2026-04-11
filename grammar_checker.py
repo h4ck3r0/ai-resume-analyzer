@@ -19,18 +19,6 @@ except ImportError:
 
 
 def check_grammar_with_gemma(resume_text: str) -> dict:
-    """
-    Check grammar using TextBlob (free, open source) or fallback to simple analysis.
-    
-    Works on ALL hosting platforms with zero external API calls.
-    
-    Args:
-        resume_text: The full resume text to analyze
-        
-    Returns:
-        Dictionary with detailed grammar and formatting feedback
-    """
-    
     if USE_TEXTBLOB and TEXTBLOB_AVAILABLE:
         return _check_with_textblob(resume_text)
     else:

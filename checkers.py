@@ -40,15 +40,6 @@ def _call_gemini_with_retry(prompt: str, max_retries: int = 3) -> str:
 
 
 def check_essential_sections(resume_text: str) -> dict:
-    """
-    Check if resume contains all essential sections.
-    
-    Args:
-        resume_text: Extracted resume text
-        
-    Returns:
-        Dictionary with section analysis
-    """
     prompt = f"""
     Analyze this resume and check for the presence of these essential sections:
     1. Contact Information (email, phone, address)
@@ -84,15 +75,6 @@ def check_essential_sections(resume_text: str) -> dict:
 
 
 def check_contact_information(resume_text: str) -> dict:
-    """
-    Validate contact information formatting and completeness.
-    
-    Args:
-        resume_text: Extracted resume text
-        
-    Returns:
-        Dictionary with contact info analysis
-    """
     prompt = f"""
     Analyze the contact information in this resume. Check if it contains:
     1. Email address (valid format)
@@ -135,15 +117,6 @@ def check_contact_information(resume_text: str) -> dict:
 
 
 def check_grammar_and_formatting(resume_text: str) -> dict:
-    """
-    Check for grammar, spelling, and formatting issues.
-    
-    Args:
-        resume_text: Extracted resume text
-        
-    Returns:
-        Dictionary with grammar/formatting analysis
-    """
     prompt = f"""
     Analyze this resume for grammar, spelling, and formatting issues.
     
@@ -182,15 +155,6 @@ def check_grammar_and_formatting(resume_text: str) -> dict:
 
 
 def run_all_checks(resume_text: str) -> dict:
-    """
-    Run all checks on the resume.
-    
-    Args:
-        resume_text: Extracted resume text
-        
-    Returns:
-        Dictionary with all analysis results
-    """
     return {
         "sections": check_essential_sections(resume_text),
         "contact": check_contact_information(resume_text),

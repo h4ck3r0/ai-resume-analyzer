@@ -7,15 +7,6 @@ MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB in bytes
 MIN_FILE_SIZE = 10 * 1024  # 10KB in bytes
 
 def validate_file_format(filename: str) -> tuple[bool, str]:
-    """
-    Validate that the file is a PDF.
-    
-    Args:
-        filename: The uploaded filename
-        
-    Returns:
-        Tuple of (is_valid, message)
-    """
     if not filename or filename == '':
         return False, "No file selected."
     
@@ -28,15 +19,6 @@ def validate_file_format(filename: str) -> tuple[bool, str]:
 
 
 def validate_file_size(file_path: str) -> tuple[bool, str]:
-    """
-    Validate file size is within acceptable range.
-    
-    Args:
-        file_path: Path to the uploaded file
-        
-    Returns:
-        Tuple of (is_valid, message)
-    """
     try:
         file_size = os.path.getsize(file_path)
         
@@ -56,17 +38,6 @@ def validate_file_size(file_path: str) -> tuple[bool, str]:
 
 
 def validate_upload(filename: str, file_path: str) -> tuple[bool, str]:
-    """
-    Complete file validation (format + size).
-    
-    Args:
-        filename: The uploaded filename
-        file_path: Path to the uploaded file
-        
-    Returns:
-        Tuple of (is_valid, message)
-    """
-    
     format_valid, format_msg = validate_file_format(filename)
     if not format_valid:
         return False, format_msg

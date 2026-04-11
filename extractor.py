@@ -64,7 +64,6 @@ def parse_resume_with_llm(text: str) -> dict:
         return {"error": f"Could not extract resume information"}
 
 def generate_feedback(resume_text: str, job_description: str) -> dict:
-    """Asks Gemini to compare the resume to the JD and provide improvement feedback."""
     prompt = f"""
     Act as an expert technical recruiter. Compare the candidate's resume to the job description.
     Identify the biggest gaps or missing keywords. 
