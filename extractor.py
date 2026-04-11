@@ -128,9 +128,20 @@ def _extract_years_experience_from_text(text: str) -> int:
 
 def parse_resume_with_llm(text: str) -> dict:
     prompt = f"""
-    You are an expert technical recruiter. Extract the following information from the resume text below.
-    Output ONLY a valid JSON object with the exact keys: "Name", "Email", "Skills" (list of strings), and "Total_Years_Experience" (integer).
-    If any field is not found, use null for Name/Email, empty list for Skills, and 0 for Total_Years_Experience.
+    You are an expert HR recruiter. Extract key information from this resume.
+    Output ONLY a valid JSON object with these EXACT keys and ensure ALL fields are populated:
+    - "Name": Full name of candidate (string, NOT null)
+    - "Email": Email address (string, NOT null) 
+    - "Phone": Phone number if available (string, can be null)
+    - "Skills": List of specific technical and professional skills (list of strings, minimum 5 items)
+    - "Total_Years_Experience": Total years of professional experience (integer, minimum 0)
+    
+    IMPORTANT:
+    - Extract SPECIFIC skills like "Python", "AWS", "Project Management", NOT vague terms like "Technical Skills"
+    - Name: If not clearly stated, derive from context or use a placeholder like "Not Provided"
+    - Email: Look for email addresses anywhere in text
+    - Skills: Extract minimum 5-10 distinct skills
+    - Years: Look for any mention of years of experience
     
     Resume Text:
     {text}
@@ -140,40 +151,44 @@ def parse_resume_with_llm(text: str) -> dict:
         if response_text:
             parsed = json.loads(response_text)
             result = {
-                'Name': parsed.get('Name'),
-                'Email': parsed.get('Email'),
-                'Skills': parsed.get('Skills', []),
-                'Total_Years_Experience': parsed.get('Total_Years_Experience', 0)
+                'Name': parsed.get('Name') or _extract_name_from_text(text),
+                'Email': parsed.get('Email') or _extract_email_from_text(text),
+                'Phone': parsed.get('Phone'),
+                'Skills': parsed.get('Skills') or [],
+                'Total_Years_Experience': parsed.get('Total_Years_Experience') or 0
             }
-            # Use fallback extraction if LLM didn't find key data
-            if not result['Name']:
-                result['Name'] = _extract_name_from_text(text)
-            if not result['Email']:
-                result['Email'] = _extract_email_from_text(text)
-            if not result['Total_Years_Experience']:
-                result['Total_Years_Experience'] = _extract_years_experience_from_text(text)
+            
+            # Ensure Skills is a valid list with at least some content
+            if not isinstance(result['Skills'], list):
+                result['Skills'] = []
+            
+            if len(result['Skills']) == 0:
+                # Extract skills as fallback
+                skill_match = re.findall(r'(Python|Java|JavaScript|React|Node|AWS|Azure|Docker|Kubernetes|SQL|NoSQL|Git|Linux|Windows|Leadership|Communication|Problem[\s-]?Solving|Project Management|Agile|Scrum)', text, re.IGNORECASE)
+                result['Skills'] = list(dict.fromkeys(skill_match))[:10]
+            
             return result
         else:
-           
             return {
                 'Name': _extract_name_from_text(text),
                 'Email': _extract_email_from_text(text),
+                'Phone': None,
                 'Skills': [],
                 'Total_Years_Experience': _extract_years_experience_from_text(text)
             }
-    except json.JSONDecodeError as e:
-      
+    except json.JSONDecodeError:
         return {
             'Name': _extract_name_from_text(text),
             'Email': _extract_email_from_text(text),
+            'Phone': None,
             'Skills': [],
             'Total_Years_Experience': _extract_years_experience_from_text(text)
         }
     except Exception as e:
-        
         return {
             'Name': _extract_name_from_text(text),
             'Email': _extract_email_from_text(text),
+            'Phone': None,
             'Skills': [],
             'Total_Years_Experience': _extract_years_experience_from_text(text)
         }
@@ -301,50 +316,265 @@ def _generate_template_fallback(job_description: str) -> dict:
         "suggested_bullets": suggested_bullets
     }
 
-def analyze_skill_gaps(resume_text: str, job_description: str) -> dict:
+def categorize_missing_skills(missing_skills: list, job_description: str, present_skills: list) -> dict:
+    """Categorize missing skills by priority and provide development recommendations."""
+    
     prompt = f"""
-    Act as an expert technical recruiter. Analyze the EXACT skills between the candidate's resume and the job requirements.
-    Extract and compare specific technical and professional skills.
-    Output ONLY a valid JSON object with keys: 
-    - "present_skills" (list of 8-10 skills found in resume)
-    - "required_skills" (list of 8-10 skills from job description)
-    - "missing_skills" (list of 5-8 skills required but not in resume)
+    You are an expert career development coach. Categorize these missing skills by priority and provide learning recommendations.
     
-    Ensure all are valid lists and non-empty.
+    MISSING SKILLS TO CATEGORIZE: {', '.join(missing_skills[:8])}
+    SKILLS CANDIDATE ALREADY HAS: {', '.join(present_skills[:10])}
     
-    Job Description:
+    For each missing skill, determine:
+    1. Priority level: "Critical" (essential), "High" (important), "Medium" (valuable), "Nice-to-have"
+    2. Learning time: How long to acquire (e.g., "2-4 weeks", "3-6 months")
+    3. Learning path: Best way to learn (e.g., "Online course", "Practice project", "Certification")
+    4. Impact: How much it affects hiring chances (1-10 scale)
+    
+    Output ONLY a valid JSON object with this structure:
+    {{
+        "critical_skills": [
+            {{"skill": "Skill Name", "timeframe": "2-4 weeks", "learning_path": "Online course", "impact": 9}}
+        ],
+        "high_priority_skills": [
+            {{"skill": "Skill Name", "timeframe": "4-8 weeks", "learning_path": "Project-based", "impact": 8}}
+        ],
+        "medium_priority_skills": [
+            {{"skill": "Skill Name", "timeframe": "2-3 months", "learning_path": "Certification course", "impact": 6}}
+        ],
+        "nice_to_have_skills": [
+            {{"skill": "Skill Name", "timeframe": "Ongoing", "learning_path": "Self-study", "impact": 4}}
+        ]
+    }}
+    
+    Job Description for context:
     {job_description}
-    
-    Resume Text:
-    {resume_text}
     """
+    
     try:
         response_text = _call_gemini_with_retry(prompt)
         if response_text:
-            result = json.loads(response_text)
-            # Validate and ensure defaults
-            if "present_skills" not in result or not isinstance(result["present_skills"], list):
-                result["present_skills"] = ["Experience", "Problem Solving", "Technical Skills"]
-            if "required_skills" not in result or not isinstance(result["required_skills"], list):
-                result["required_skills"] = ["Python", "System Design", "Communication"]
-            if "missing_skills" not in result or not isinstance(result["missing_skills"], list):
-                result["missing_skills"] = ["Advanced frameworks", "Specialized tools", "Domain expertise"]
-            return result
-        else:
+            categorized = json.loads(response_text)
             return {
-                "present_skills": ["Technical Knowledge", "Problem Solving", "Collaboration"],
-                "required_skills": ["Python", "AWS", "System Design", "Communication"],
-                "missing_skills": ["Advanced specialization", "Specific certifications"]
+                "categorized_skills": categorized,
+                "total_missing": len(missing_skills),
+                "immediate_action_skills": categorized.get("critical_skills", [])[:3]
             }
-    except json.JSONDecodeError:
-        return {
-            "present_skills": ["Job-related skills", "Industry experience", "Technical background"],
-            "required_skills": ["Job posting requirements", "Technical skills needed", "Nice-to-have skills"],
-            "missing_skills": ["Skills gap identified", "Areas to develop", "Learning opportunities"]
-        }
+    except Exception:
+        pass
+    
+    # Fallback categorization using keyword matching
+    skill_keywords = {
+        "critical": ["Python", "Java", "AWS", "Docker", "Kubernetes", "SQL", "Leadership", "API", "Git"],
+        "high": ["JavaScript", "React", "Angular", "Node", "DevOps", "Testing", "CI/CD", "Database"],
+        "medium": ["CSS", "HTML", "Agile", "Communication", "Project Management", "Version Control"],
+        "nice": ["Presentation", "Documentation", "Writing", "Public Speaking"]
+    }
+    
+    categorized = {
+        "critical_skills": [],
+        "high_priority_skills": [],
+        "medium_priority_skills": [],
+        "nice_to_have_skills": []
+    }
+    
+    for skill in missing_skills:
+        skill_lower = skill.lower()
+        assigned = False
+        
+        for level, keywords in skill_keywords.items():
+            if any(kw.lower() in skill_lower for kw in keywords):
+                if level == "critical":
+                    categorized["critical_skills"].append({"skill": skill, "timeframe": "2-4 weeks", "learning_path": "Online course + projects", "impact": 9})
+                elif level == "high":
+                    categorized["high_priority_skills"].append({"skill": skill, "timeframe": "4-8 weeks", "learning_path": "Projects + documentation", "impact": 8})
+                elif level == "medium":
+                    categorized["medium_priority_skills"].append({"skill": skill, "timeframe": "2-3 months", "learning_path": "Courses + practice", "impact": 6})
+                else:
+                    categorized["nice_to_have_skills"].append({"skill": skill, "timeframe": "Ongoing", "learning_path": "Self-study", "impact": 4})
+                assigned = True
+                break
+        
+        if not assigned:
+            # Default to high priority if unknown
+            categorized["high_priority_skills"].append({"skill": skill, "timeframe": "4-8 weeks", "learning_path": "Research + practice", "impact": 7})
+    
+    return {
+        "categorized_skills": categorized,
+        "total_missing": len(missing_skills),
+        "immediate_action_skills": categorized["critical_skills"][:3]
+    }
+
+
+def analyze_skill_gaps(resume_text: str, job_description: str) -> dict:
+    """Extract and categorize skill gaps using Gemini AI with detailed analysis."""
+    
+    # Stage 1: Extract skills from resume and job description
+    extraction_prompt = f"""
+    You are an expert technical recruiter with 20+ years of experience. Your task is to extract and compare skills.
+    
+    TASK 1 - EXTRACT FROM RESUME:
+    List EVERY technical skill, programming language, tool, framework, platform, and professional competency mentioned in the resume text below.
+    Be exhaustive - include languages, databases, frameworks, methodologies, soft skills, certifications, etc.
+    
+    TASK 2 - EXTRACT FROM JOB DESCRIPTION:
+    List EVERY skill and requirement mentioned in the job description. Include required skills, preferred skills, nice-to-have skills.
+    
+    TASK 3 - IDENTIFY GAPS:
+    Find skills that appear in the job description but NOT in the resume.
+    
+    TASK 4 - CATEGORIZE BY IMPORTANCE:
+    For each missing skill, determine if it's:
+    - "Critical" (mentioned multiple times, core to the role)
+    - "Important" (core responsibility or requirement)
+    - "Valuable" (nice-to-have or supplementary)
+    
+    IMPORTANT GUIDELINES:
+    - Be SPECIFIC: "Python" not "Programming"; "AWS Lambda" not "Cloud"; "React" not "Frontend"
+    - Extract minimum 15-20 skills per list for comprehensive analysis
+    - Include soft skills: "Leadership", "Communication", "Problem Solving", "Team Collaboration"
+    - NEVER use vague terms like "Technical Skills", "Experience", "Knowledge"
+    
+    Return ONLY valid JSON (no markdown, no text before/after):
+    {{
+        "resume_skills": [list of 15-25 specific skills from resume],
+        "job_description_skills": [list of 15-25 specific skills from job posting],
+        "critical_missing_skills": [skills required but missing from resume],
+        "important_missing_skills": [supplementary skills missing from resume],
+        "valuable_missing_skills": [nice-to-have skills missing from resume]
+    }}
+    
+    Resume Text:
+    {resume_text}
+    
+    Job Description:
+    {job_description}
+    """
+    
+    try:
+        response_text = _call_gemini_with_retry(extraction_prompt)
+        if response_text:
+            result = json.loads(response_text)
+            
+            # Validate response structure
+            resume_skills = result.get("resume_skills", [])
+            job_skills = result.get("job_description_skills", [])
+            critical_missing = result.get("critical_missing_skills", [])
+            important_missing = result.get("important_missing_skills", [])
+            valuable_missing = result.get("valuable_missing_skills", [])
+            
+            # Combine all missing skills
+            all_missing = critical_missing + important_missing + valuable_missing
+            
+            # Stage 2: Get learning recommendations for missing skills
+            if all_missing:
+                recommendations = _get_skill_development_plan(all_missing, job_description, resume_skills)
+            else:
+                recommendations = {"categorized_skills": {}, "learning_paths": {}}
+            
+            return {
+                "present_skills": resume_skills[:20] if resume_skills else ["Communication", "Problem Solving"],
+                "required_skills": job_skills[:20] if job_skills else ["Technical skills"],
+                "missing_skills": critical_missing + important_missing + valuable_missing,
+                "missing_skills_by_priority": {
+                    "critical": critical_missing[:5],
+                    "important": important_missing[:5],
+                    "valuable": valuable_missing[:5]
+                },
+                "skill_development_plan": recommendations
+            }
+    except json.JSONDecodeError as e:
+        print(f"JSON parsing error in skill extraction: {e}")
     except Exception as e:
-        return {
-            "present_skills": ["Core competencies", "Transferable skills"],
-            "required_skills": ["Job requirements", "Essential skills"],
-            "missing_skills": ["Skills to develop", "Training areas"]
-        }
+        print(f"Error in skill gap analysis: {e}")
+    
+    # Fallback to simpler extraction
+    return _fallback_skill_gap_analysis(resume_text, job_description)
+
+
+def _get_skill_development_plan(missing_skills: list, job_description: str, present_skills: list) -> dict:
+    """Get learning recommendations for missing skills using Gemini."""
+    
+    skills_list = ", ".join(missing_skills[:15])
+    present_list = ", ".join(present_skills[:10])
+    
+    plan_prompt = f"""
+    You are a career development expert. Create a learning and development plan for acquiring these missing skills.
+    
+    MISSING SKILLS TO DEVELOP: {skills_list}
+    SKILLS ALREADY POSSESSED: {present_list}
+    JOB ROLE CONTEXT: {job_description[:500]}
+    
+    For EACH missing skill, provide:
+    1. Priority: 1-10 (10 = most critical for getting hired)
+    2. Learning timeframe: Realistic time to gain proficiency
+    3. Best learning methods: Specific resources, courses, projects, certifications
+    4. How to demonstrate: How to show this skill to employers (portfolio, project, certification, GitHub)
+    
+    Return ONLY valid JSON:
+    {{
+        "skill_development": [
+            {{
+                "skill": "Skill Name",
+                "priority": 9,
+                "timeframe": "4-6 weeks",
+                "learning_methods": ["Udemy course XYZ", "Build 2-3 projects", "Practice with datasets"],
+                "demonstration": "GitHub portfolio + completed projects",
+                "resources": ["URL 1", "URL 2"]
+            }}
+        ],
+        "quick_wins": ["Skills that can be picked up in 1-2 weeks"],
+        "long_term_goals": ["Skills requiring 3+ months of dedicated learning"],
+        "estimated_total_learning_time": "3-6 months"
+    }}
+    """
+    
+    try:
+        response_text = _call_gemini_with_retry(plan_prompt)
+        if response_text:
+            plan = json.loads(response_text)
+            return plan
+    except Exception as e:
+        print(f"Error getting skill development plan: {e}")
+    
+    return {"categorized_skills": {}, "learning_paths": {}}
+
+
+def _fallback_skill_gap_analysis(resume_text: str, job_description: str) -> dict:
+    """Fallback skill gap analysis when Gemini fails."""
+    
+    # Extract common skills using regex
+    skill_patterns = {
+        "programming": r"\b(Python|Java|JavaScript|TypeScript|C\+\+|C#|Go|Rust|Ruby|PHP|Swift|Kotlin|R|MATLAB|Scala)\b",
+        "web": r"\b(React|Vue|Angular|Node\.js|Express|Django|Flask|Spring|FastAPI|Next\.js|Svelte|HTML|CSS|SASS|Bootstrap)\b",
+        "cloud": r"\b(AWS|Azure|Google Cloud|GCP|Lambda|EC2|S3|RDS|Firebase|Heroku|DigitalOcean)\b",
+        "devops": r"\b(Docker|Kubernetes|Jenkins|GitHub Actions|GitLab CI|Terraform|Ansible|CloudFormation|CI/CD)\b",
+        "database": r"\b(SQL|PostgreSQL|MySQL|MongoDB|Redis|Elasticsearch|DynamoDB|Oracle|Firebase|Cassandra)\b",
+        "soft": r"\b(Leadership|Communication|Problem[\s-]?Solving|Team[\s-]?Work|Project[\s-]?Management|Agile|Scrum|Presentation)\b"
+    }
+    
+    resume_skills = []
+    job_skills = []
+    
+    for category, pattern in skill_patterns.items():
+        resume_matches = re.findall(pattern, resume_text, re.IGNORECASE)
+        job_matches = re.findall(pattern, job_description, re.IGNORECASE)
+        resume_skills.extend(resume_matches)
+        job_skills.extend(job_matches)
+    
+    resume_skills = list(dict.fromkeys(resume_skills))  # Remove duplicates
+    job_skills = list(dict.fromkeys(job_skills))
+    
+    missing = [skill for skill in job_skills if skill not in resume_skills]
+    
+    return {
+        "present_skills": resume_skills[:20] if resume_skills else ["Communication", "Problem Solving"],
+        "required_skills": job_skills[:20] if job_skills else ["Technical skills"],
+        "missing_skills": missing[:15] if missing else ["Specialized skills"],
+        "missing_skills_by_priority": {
+            "critical": missing[:5] if missing else [],
+            "important": missing[5:10] if len(missing) > 5 else [],
+            "valuable": missing[10:] if len(missing) > 10 else []
+        },
+        "skill_development_plan": {}
+    }

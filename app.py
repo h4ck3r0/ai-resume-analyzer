@@ -139,7 +139,7 @@ def skill_gaps_api():
     file_path = os.path.join(UPLOAD_DIR, filename)
     resume_file.save(file_path)
     
-    raw_text = extract_text_from_pdf(file_path)
+    raw_text = extract_resume_text(file_path)
     skill_gaps = analyze_skill_gaps(raw_text, job_description)
     
     if os.path.exists(file_path):

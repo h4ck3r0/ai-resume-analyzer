@@ -2,6 +2,27 @@ import re
 import json
 
 
+def _detect_resume_sections(text: str) -> dict:
+    """Detect major resume sections and their locations in the text."""
+    sections = {}
+    section_patterns = {
+        'contact': r'(?:contact|email|phone|address|linkedin|github)',
+        'summary': r'(?:professional\s+summary|summary|objective|profile)',
+        'skills': r'(?:technical\s+skills|skills|competencies|expertise)',
+        'experience': r'(?:work\s+experience|professional\s+experience|experience|employment)',
+        'education': r'(?:education|academic|degree|university|college)',
+        'projects': r'(?:projects|portfolio|side\s+projects)',
+        'certifications': r'(?:certifications|licenses|achievements|awards)',
+    }
+    
+    # Find positions of each section
+    for section_name, pattern in section_patterns.items():
+        for match in re.finditer(pattern, text, re.IGNORECASE):
+            sections[section_name] = match.start()
+    
+    return sections
+
+
 def _call_gemini_with_retry(prompt: str, max_retries: int = 3) -> str:
     
     from google import genai
@@ -33,88 +54,205 @@ ACTION_VERBS = [
 
 
 def extract_education(text: str) -> list:
+    """Extract education information using LLM with regex fallback."""
+    if not text:
+        return []
+    
+    # Try LLM-based extraction first
+    prompt = f"""
+    Extract ONLY the education section from this resume.
+    List each degree, field of study, and institution found.
+    Return as a JSON array of strings, each entry in format: "Degree - Field of Study from Institution (Year if available)"
+    Only return the array, nothing else.
+    Example: ["Bachelor of Science in Computer Science from Stanford University (2020)", "Master of Science in Machine Learning from MIT"]
+    If no education found, return empty array: []
+    
+    Resume Text:
+    {text}
+    """
+    
+    try:
+        response_text = _call_gemini_with_retry(prompt)
+        if response_text:
+            education = json.loads(response_text)
+            if isinstance(education, list) and len(education) > 0:
+                return education[:5]  # Return max 5 entries
+    except (json.JSONDecodeError, Exception):
+        pass
+    
+    # Fallback to improved regex patterns
     education = []
+    
+    # Pattern for degree types and fields
     degree_patterns = [
-        r"(?:bachelor|b\.?s\.?|b\.?a\.?|master|m\.?s\.?|m\.?b\.?a\.?|phd|ph\.?d\.?|doctorate).*?(?:in|of)?\s+([a-z\s]+?)(?:\s+from|\s+at|\n|$)",
-        r"(?:from|at)?\s*([A-Z][a-z\s]+(?:University|College|Institute|School)).*?(?:\d{4})?",
+        r"(?:bachelor|b\.s\.|b\.a\.|master|m\.s\.|m\.b\.a\.|phd|doctorate|d\.d\.s\.|md)\s+(?:in|of|–|—)?\s*([a-z&\s,]+?)(?:\s+from|\s+at|\n|—|–|\d{4}|$)",
+        r"(?:from|at)?\s*([A-Z][a-z\s&,]+?(?:University|College|Institute|School|Academy|Institute of Technology))(?:\s+\(|\n|\d{4})?",
     ]
     
     for pattern in degree_patterns:
         matches = re.findall(pattern, text, re.IGNORECASE)
-        education.extend(matches[:2])
+        education.extend([m.strip() for m in matches if m.strip()])
     
-    return list(dict.fromkeys(education))[:3]  # Return unique, max 3
+    # Remove duplicates and return
+    return list(dict.fromkeys(education))[:5]
 
 
 def extract_work_experience(text: str) -> list:
+    """Extract work experience using LLM with regex fallback."""
+    if not text:
+        return []
+    
+    # Try LLM-based extraction first
+    prompt = f"""
+    Extract ONLY the work experience/professional experience section from this resume.
+    For each position, list: Job Title at Company (Duration if available)
+    Return as a JSON array of strings.
+    Only return the array, nothing else.
+    Example: ["Senior Software Engineer at Google (2020-2024)", "Full Stack Developer at Startup Inc (2018-2020)"]
+    If no work experience found, return empty array: []
+    
+    Resume Text:
+    {text}
+    """
+    
+    try:
+        response_text = _call_gemini_with_retry(prompt)
+        if response_text:
+            experience = json.loads(response_text)
+            if isinstance(experience, list) and len(experience) > 0:
+                return experience[:8]  # Return max 8 entries
+    except (json.JSONDecodeError, Exception):
+        pass
+    
+    # Fallback to improved regex patterns
     experience = []
     
-    job_patterns = [
-        r"(?:Senior|Junior|Lead)?\s*([A-Z][a-z\s]+(?:Engineer|Developer|Manager|Analyst|Designer|Architect))",
-        r"(?:at|with|company:?)\s*([A-Z][a-zA-Z\s&,\.]+?)(?:\n|\s{2,}|$)"
-    ]
+    job_title_pattern = r"(?:^|\n)\s*([A-Z][a-z\s]*?(?:Engineer|Developer|Manager|Analyst|Designer|Architect|Director|Lead|Specialist|Consultant|Officer|Executive|Administrator|Coordinator|Technician)[a-z\s]*?)(?:\s+at|\s+–|\s+-|$)"
     
-    for pattern in job_patterns:
-        matches = re.findall(pattern, text)
-        experience.extend(matches[:2])
+    company_pattern = r"(?:at|with|company\s*[:=]?)\s*([A-Z][a-zA-Z\s&,\.'-]+?)(?:\n|$|\s+\(|\s+\d{4})"
     
-    return list(dict.fromkeys(experience))[:5]  # Return unique, max 5
+    job_titles = re.findall(job_title_pattern, text, re.IGNORECASE | re.MULTILINE)
+    companies = re.findall(company_pattern, text)
+    
+    # Combine job titles and companies
+    for title in job_titles[:5]:
+        if title.strip():
+            experience.append(title.strip())
+    
+    for company in companies[:5]:
+        if company.strip() and company.strip() not in experience:
+            experience.append(company.strip())
+    
+    return list(dict.fromkeys(experience))[:8]
 
 
 def extract_contact_info(text: str) -> dict:
+    """Extract contact information with improved regex patterns."""
     contact = {
         'phone': None,
+        'email': None,
         'linkedin': None,
         'github': None,
         'website': None
     }
     
-  
-    phone_match = re.search(r'(?:\+?1[-.\s]?)?\(?(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})', text)
-    if phone_match:
-        contact['phone'] = f"{phone_match.group(1)}-{phone_match.group(2)}-{phone_match.group(3)}"
+    # Extract email - improved pattern
+    email_match = re.search(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', text)
+    if email_match:
+        contact['email'] = email_match.group(0)
     
-   
-    linkedin_match = re.search(r'linkedin\.com/in/([a-z0-9\-]+)', text, re.IGNORECASE)
+    # Extract phone - improved pattern for various formats
+    phone_patterns = [
+        r'(?:\+?1[-.\s]?)?\(?(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})',  # US format
+        r'\+\d{1,3}\s?\d{1,14}',  # International format
+        r'\(?(\d{10})\)?'  # 10 digit format
+    ]
+    
+    for pattern in phone_patterns:
+        phone_match = re.search(pattern, text)
+        if phone_match:
+            if len(phone_match.groups()) >= 3:
+                contact['phone'] = f"{phone_match.group(1)}-{phone_match.group(2)}-{phone_match.group(3)}"
+            else:
+                contact['phone'] = phone_match.group(0)
+            break
+    
+    # Extract LinkedIn profile
+    linkedin_match = re.search(r'(?:linkedin\.com/in/|linkedin:|user:)\s*([a-z0-9\-]+)', text, re.IGNORECASE)
     if linkedin_match:
         contact['linkedin'] = linkedin_match.group(1)
     
-  
-    github_match = re.search(r'github\.com/([a-z0-9\-]+)', text, re.IGNORECASE)
+    # Extract GitHub profile
+    github_match = re.search(r'(?:github\.com/|github:|@)\s*([a-z0-9\-]+)', text, re.IGNORECASE)
     if github_match:
         contact['github'] = github_match.group(1)
     
-  
-    website_match = re.search(r'(?:www\.)?([a-z0-9\-]+\.(?:com|io|dev|co))', text, re.IGNORECASE)
-    if website_match:
-        contact['website'] = website_match.group(1)
+    # Extract website/portfolio
+    website_patterns = [
+        r'(?:website|portfolio)\s*[:=]?\s*(https?://[^\s]+)',
+        r'(?:www\.)?([a-z0-9\-]+\.(?:com|io|dev|co|net|org))',
+    ]
     
-    return {k: v for k, v in contact.items() if v}
+    for pattern in website_patterns:
+        website_match = re.search(pattern, text, re.IGNORECASE)
+        if website_match:
+            contact['website'] = website_match.group(1) if '://' not in website_match.group(1) else website_match.group(1)
+            break
+    
+    return {k: v for k, v in contact.items() if v is not None}
 
 
 def analyze_ats_compliance(text: str) -> dict:
+    """Analyze ATS compliance with more detailed checks."""
     issues = []
     score = 100
     
-    if len(text) < 200:
-        issues.append("Resume may be too short for proper ATS parsing")
+    # Check length
+    word_count = len(text.split())
+    if word_count < 200:
+        issues.append("Resume too short - ATS parsing may fail (minimum 200 words recommended)")
+        score -= 15
+    elif word_count > 1500:
+        issues.append("Resume possibly too long - may overwhelm ATS systems (maximum 1500 words recommended)")
+        score -= 10
+    
+    # Check for problematic characters
+    if text.count('|') > 10:
+        issues.append("Excessive use of pipes/special characters - use clean formatting for ATS")
         score -= 15
     
-    if '|' in text and text.count('|') > 5:
-        issues.append("Excessive use of special characters or tables detected")
+    if text.count('•') > 20 or text.count('°') > 5:
+        issues.append("Special bullet characters may not parse correctly - use standard bullets or dashes")
         score -= 10
     
-    if not re.search(r'(experience|education|skills)', text, re.IGNORECASE):
-        issues.append("Missing standard resume sections")
+    # Check for standard sections
+    required_sections = ['experience', 'education', 'skills']
+    found_sections = sum(1 for section in required_sections if re.search(section, text, re.IGNORECASE))
+    
+    if found_sections < 2:
+        issues.append("Missing standard resume sections - ensure Education, Experience, and Skills are included")
+        score -= 20
+    
+    # Check for proper line breaks
+    lines = text.split('\n')
+    if len(lines) < 12:
+        issues.append("Poor formatting - resume appears overly compressed without proper line breaks")
         score -= 10
     
-    if len(text.split('\n')) < 10:
-        issues.append("Poor formatting - resume appears compressed")
+    # Check for email presence
+    if not re.search(r'[\w\.-]+@[\w\.-]+\.\w+', text):
+        issues.append("No email address found - critical for ATS to contact you")
+        score -= 15
+    
+    # Check for contact info
+    if not re.search(r'\d{3}[-.\s]?\d{3}[-.\s]?\d{4}', text):
+        issues.append("Phone number not formatted clearly - ensure standard format (XXX-XXX-XXXX)")
         score -= 5
     
     return {
         'score': max(score, 0),
-        'issues': issues[:3] if issues else ['No major ATS issues detected']
+        'issues': issues[:5] if issues else ['ATS compliance looks good - resume should parse correctly'],
+        'word_count': word_count
     }
 
 
