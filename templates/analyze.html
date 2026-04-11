@@ -10,8 +10,11 @@
         </div>
 
         <!-- Analysis Form -->
-        <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05)); border-radius: 16px; padding: 3rem; margin-bottom: 2rem; border: 1px solid #e2e8f0;">
-            <h2 style="text-align: center; margin-bottom: 2rem;">Start Your Analysis</h2>
+        <div class="gradient-bg-light">
+            <div class="section-header">
+                <h2 class="section-title" style="justify-content: center;">Start Your Analysis</h2>
+                <p class="section-subtitle" style="text-align: center;">Upload your resume and job description for instant ATS analysis</p>
+            </div>
             
             {% if error %}
                 <div style="background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem; margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center; color: #991b1b;">
@@ -21,45 +24,161 @@
             {% endif %}
 
             <form action="/analyze" method="POST" enctype="multipart/form-data">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                <div class="grid-2" style="margin-bottom: 2rem;">
                     <div class="form-group">
                         <label for="job_description"><strong>Job Description</strong></label>
-                        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.75rem;">Paste the complete job description you're targeting</p>
-                        <textarea id="job_description" name="job_description" rows="6" placeholder="Example: Senior Software Engineer - 5+ years experience with React, Node.js, AWS..." required style="font-size: 16px;">{{ job_desc if job_desc else '' }}</textarea>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Paste the complete job description you're targeting</p>
+                        <textarea id="job_description" name="job_description" rows="6" placeholder="Example: Senior Software Engineer - 5+ years experience with React, Node.js, AWS..." required>{{ job_desc if job_desc else '' }}</textarea>
                     </div>
 
                     <div class="form-group">
                         <label for="resume"><strong>Upload Your Resume</strong></label>
-                        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.75rem;">PDF format recommended for best results</p>
-                        <input type="file" id="resume" name="resume" accept="application/pdf" required style="padding: 2rem; border: 2px dashed #cbd5e1; background: white; font-size: 16px;">
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">PDF format recommended for best results</p>
+                        <div style="display: flex; align-items: center; justify-content: center; padding: 2rem; border: 2px dashed var(--border-medium); border-radius: var(--radius-lg); background: var(--bg-secondary); cursor: pointer; transition: all var(--transition-fast);" onmouseover="this.style.borderColor='var(--primary)'; this.style.background='rgba(99, 102, 241, 0.05)'" onmouseout="this.style.borderColor='var(--border-medium)'; this.style.background='var(--bg-secondary)'">
+                            <input type="file" id="resume" name="resume" accept="application/pdf" required style="display: none;">
+                            <label for="resume" style="cursor: pointer; text-align: center; width: 100%;">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📄</div>
+                                <div style="font-weight: 600; color: var(--text-primary);">Click to upload</div>
+                                <div style="font-size: 0.85rem; color: var(--text-secondary);">or drag and drop</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">PDF files only (Max 5MB)</div>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-primary" style="width: 100%; padding: 1.2rem; font-size: 1.1rem;">🚀 Analyze Resume (Takes ~5 seconds)</button>
+                <button type="submit" class="btn-primary" style="min-height: 48px;">🚀 Analyze Resume (Takes ~5 seconds)</button>
             </form>
-
-            <style>
-                @media (max-width: 768px) {
-                    div[style*="grid-template-columns: 1fr 1fr"] {
-                        grid-template-columns: 1fr !important;
-                        gap: 1.5rem !important;
-                    }
-                    
-                    textarea, input[type="file"] {
-                        padding: 1rem !important;
-                        font-size: 16px !important;
-                    }
-                }
-            </style>
         </div>
 
     {% if score %}
-    <!-- RESULTS SECTION - NEW DESIGN -->
-    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem; margin-bottom: 3rem;">
+    <!-- RESULTS SECTION - FIGMA DESIGN -->
+    <div class="grid-2" style="margin-bottom: 3rem;">
         
-        <!-- LEFT CARD: Score & Options -->
-        <div style="background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
-            <h2 style="text-align: center; margin-bottom: 2rem; color: #1e293b; font-size: 1.5rem;">Your Score</h2>
+        <!-- LEFT CARD: Score Display -->
+        <div class="card">
+            <div class="score-gauge-wrapper">
+                <svg width="160" height="100" viewBox="0 0 200 120" style="max-width: 100%; height: auto;">
+                    <!-- Background arc -->
+                    <path d="M 40 100 A 60 60 0 0 1 160 100" stroke="#e2e8f0" stroke-width="8" fill="none" stroke-linecap="round"/>
+                    <!-- Filled arc -->
+                    <path d="M 40 100 A 60 60 0 0 1 160 100" stroke="url(#scoreGradient)" stroke-width="8" fill="none" stroke-linecap="round" style="stroke-dasharray: {{ (score.replace('%', '') | int * 1.26) }}, 503;"/>
+                    <defs>
+                        <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color: #6366f1; stop-opacity: 1"/>
+                            <stop offset="100%" style="stop-color: #8b5cf6; stop-opacity: 1"/>
+                        </linearGradient>
+                    </defs>
+                    <text x="100" y="70" text-anchor="middle" font-size="40" font-weight="bold" fill="#1e293b">{{ score }}</text>
+                </svg>
+            </div>
+            
+            <div class="score-display">
+                <div class="score-label">ATS Match Score</div>
+                <div class="score-rating">{{ rating }}</div>
+            </div>
+        </div>
+
+        <!-- RIGHT CARD: Analysis Checklist -->
+        <div class="card" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));">
+            <h3 class="section-title" style="justify-content: flex-start;">✓ Analysis Complete</h3>
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-icon">✓</div>
+                    <span class="checklist-text">Resume extracted & parsed</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">✓</div>
+                    <span class="checklist-text">Matched against job requirements</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">✓</div>
+                    <span class="checklist-text">Skills & experience analyzed</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">✓</div>
+                    <span class="checklist-text">Grammar check completed</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">✓</div>
+                    <span class="checklist-text">Improvement suggestions ready</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Analysis Section -->
+    <div class="grid-2" style="margin-bottom: 3rem;">
+        <!-- Score Details -->
+        <div class="card">
+            <h3 class="section-title">📊 Score Breakdown</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border-light);">
+                    <span style="color: var(--text-secondary);">Percentile</span>
+                    <strong style="color: var(--text-primary);">{{ percentile }}th</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border-light);">
+                    <span style="color: var(--text-secondary);">Industry Average</span>
+                    <strong style="color: var(--text-primary);">{{ industry_avg }}%</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0;">
+                    <span style="color: var(--text-secondary);">Comparison</span>
+                    <strong style="color: {% if comparison == 'Above' %}var(--success){% else %}var(--error){% endif %};">{{ comparison }} Average</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Extracted Skills -->
+        <div class="card">
+            <h3 class="section-title" style="justify-content: flex-start;">🎯 Extracted Skills</h3>
+            <div class="skills-container">
+                {% for skill in extracted_skills[:10] %}
+                    <span class="skill-badge">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Matched & Missing Requirements -->
+    <div class="grid-2" style="margin-bottom: 3rem;">
+        <div class="card">
+            <h3 class="section-title" style="justify-content: flex-start;">✅ Matched Requirements</h3>
+            <ul class="list-with-icons">
+                {% for req in matched_requirements[:5] %}
+                    <li>{{ req }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3 class="section-title" style="justify-content: flex-start;">⚠️ Missing Skills</h3>
+            <ul class="list-with-icons warning">
+                {% for skill in missing_skills[:5] %}
+                    <li class="warning">{{ skill }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Grammar & Quality Check -->
+    {% if grammar_check and not grammar_check.get('error') %}
+    <div class="card" style="margin-bottom: 3rem;">
+        <h3 class="section-title" style="justify-content: flex-start;">✍️ Grammar & Quality Check</h3>
+        <div class="grid-3" style="gap: 1rem; margin-top: 1.5rem;">
+            <div style="padding: 1rem; background: var(--info-light); border-radius: var(--radius-lg);">
+                <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Grammar Score</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--info);">{{ grammar_check.get('grammar_score', 0) }}%</div>
+            </div>
+            <div style="padding: 1rem; background: rgba(139, 92, 246, 0.1); border-radius: var(--radius-lg);">
+                <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Spelling Score</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--secondary);">{{ grammar_check.get('spelling_score', 0) }}%</div>
+            </div>
+            <div style="padding: 1rem; background: var(--warning-light); border-radius: var(--radius-lg);">
+                <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Overall Quality</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--warning);">{{ grammar_check.get('overall_quality_score', 0) }}%</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
             
             <!-- Score Gauge SVG -->
             <svg width="200" height="120" style="display: block; margin: 0 auto 2rem; background: transparent;" viewBox="0 0 200 120">

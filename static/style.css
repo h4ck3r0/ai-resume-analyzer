@@ -1,11 +1,18 @@
 
 :root {
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
-    --primary-dark: #4338ca;
-    --secondary: #0ea5e9;
-    --tertiary: #8b5cf6;
+    /* ========================================
+       DESIGN TOKENS FROM FIGMA
+       ======================================== */
     
+    /* Brand Colors */
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-darker: #4338ca;
+    --secondary: #8b5cf6;
+    --secondary-dark: #7c3aed;
+    --tertiary: #0ea5e9;
+    
+    /* Status Colors */
     --success: #10b981;
     --success-light: #d1fae5;
     --info: #0ea5e9;
@@ -15,30 +22,38 @@
     --error: #ef4444;
     --error-light: #fee2e2;
     
+    /* Neutral Background */
     --bg-primary: #ffffff;
     --bg-secondary: #f8fafc;
     --bg-tertiary: #f1f5f9;
+    --bg-hover: #f8fafc;
     
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #64748b;
+    /* Text Colors */
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --text-white: #ffffff;
     
+    /* Border & UI */
     --border-light: #e2e8f0;
     --border-medium: #cbd5e1;
+    --input-bg: #f8fafc;
+    --input-border: #e2e8f0;
     
+    /* Shadows */
     --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 25px 0 rgba(0, 0, 0, 0.12);
-    --shadow-xl: 0 20px 40px 0 rgba(0, 0, 0, 0.15);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
     
-    --radius-small: 6px;
+    /* Border Radius */
     --radius-base: 8px;
     --radius-lg: 12px;
     --radius-xl: 16px;
-    --radius-2xl: 24px;
     
+    /* Transitions */
     --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: 0.15s ease-in-out;
 }
 
 /* =========================================
@@ -257,36 +272,44 @@ a:hover {
 .btn-secondary,
 .btn-tertiary,
 button[type="submit"] {
-    display: inline-block;
-    padding: 1rem 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
     font-size: 1rem;
     font-weight: 600;
     border: none;
     border-radius: var(--radius-lg);
     cursor: pointer;
-    transition: all var(--transition);
+    transition: all var(--transition-fast);
     text-decoration: none;
     text-align: center;
     user-select: none;
+    gap: 0.5rem;
 }
 
 .btn-primary,
 button[type="submit"] {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: var(--text-white);
     box-shadow: var(--shadow-md);
     width: 100%;
 }
 
 .btn-primary:hover,
 button[type="submit"]:hover {
-    transform: translateY(-2px);
+    transform: scale(1.05);
     box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:active,
+button[type="submit"]:active {
+    transform: scale(0.98);
 }
 
 .btn-primary.btn-large,
 .btn-secondary.btn-large {
-    padding: 1.25rem 2.5rem;
+    padding: 1rem 2rem;
     font-size: 1.1rem;
     width: auto;
 }
@@ -301,6 +324,7 @@ button[type="submit"]:hover {
 .btn-secondary:hover {
     background: var(--border-light);
     border-color: var(--border-medium);
+    transform: scale(1.02);
 }
 
 /* =========================================
