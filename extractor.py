@@ -81,32 +81,73 @@ def extract_resume_text(file_path: str) -> str:
         return f"Error: Unsupported file format: .{file_ext}"
 
 def _extract_name_from_text(text: str) -> str:
-   
+    """Extract name from resume text with improved pattern matching."""
     if not text:
-        return None
+        return "Not provided"
+    
+    import re
     
     lines = text.strip().split('\n')
-   
-    for line in lines:
+    
+    for line in lines[:15]:
         line = line.strip()
-        # Skip lines that are obviously not names (too long, all caps headers, etc)
-        if len(line) > 50 or line.isupper():
+        
+        if not line or len(line) < 2:
             continue
-        # Skip lines with email or special characters
-        if '@' in line or '(' in line or ')' in line:
+        
+        if len(line) > 60 or line.count('\t') > 2:
             continue
-        # First substantial line is likely the name
-        if len(line) > 2 and len(line.split()) <= 4:
+        
+        if '@' in line or '.com' in line.lower() or 'http' in line.lower():
+            continue
+        
+        headers = ['phone', 'email', 'linkedin', 'github', 'website', 'address', 'objective', 'summary', 
+                  'experience', 'education', 'skills', 'certifications', 'projects', 'languages', 'references']
+        if any(header in line.lower() for header in headers):
+            continue
+        
+        # Check if it looks like a name (1-4 words, starts with capital)
+        words = line.split()
+        if 1 <= len(words) <= 4 and line[0].isupper() and not line.isupper():
             return line
-    return None
+    
+    name_pattern = r'^([A-Z][a-z]+ [A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)$'
+    for line in lines[:20]:
+        line = line.strip()
+        if re.match(name_pattern, line):
+            return line
+    
+    email_match = re.search(r'([a-zA-Z0-9._%+-]+)@', text)
+    if email_match:
+        name_from_email = email_match.group(1).replace('.', ' ').replace('_', ' ').title()
+        if len(name_from_email) > 2:
+            return name_from_email
+    
+    return "Not provided"
 
 
 def _extract_email_from_text(text: str) -> str:
-    """Extract email from resume text."""
+    """Extract email from resume text with improved patterns."""
     if not text:
-        return None
+        return "Not provided"
+    
     email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', text)
-    return email_match.group() if email_match else None
+    if email_match:
+        return email_match.group()
+    
+    alt_patterns = [
+        r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}',
+        r'(?:Email|email|EMAIL)[\s:]*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+)',
+        r'(?:mailto:)?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+)',
+    ]
+    
+    for pattern in alt_patterns:
+        match = re.search(pattern, text)
+        if match:
+            if '@' in match.group():
+                return match.group().replace('mailto:', '')
+    
+    return "Not provided"
 
 
 def _extract_years_experience_from_text(text: str) -> int:
@@ -116,7 +157,7 @@ def _extract_years_experience_from_text(text: str) -> int:
     
     experience_matches = re.findall(r'(\d+)\+?\s*(?:years?|yrs?)\s+(?:of\s+)?(?:experience|exp)', text.lower())
     if experience_matches:
-        # Return the maximum found (usually most relevant)
+        
         return max(int(x) for x in experience_matches)
     
     exp_match = re.search(r'(\d+)\s+years?\s+(?:of\s+)?(?:professional\s+)?experience', text.lower())
@@ -129,19 +170,20 @@ def _extract_years_experience_from_text(text: str) -> int:
 def parse_resume_with_llm(text: str) -> dict:
     prompt = f"""
     You are an expert HR recruiter. Extract key information from this resume.
-    Output ONLY a valid JSON object with these EXACT keys and ensure ALL fields are populated:
-    - "Name": Full name of candidate (string, NOT null)
-    - "Email": Email address (string, NOT null) 
+    Output ONLY a valid JSON object with these EXACT keys and ensure ALL fields are populated with non-null values:
+    - "Name": Full name of candidate (string, MUST NOT be null or empty)
+    - "Email": Email address (string, MUST NOT be null or empty) 
     - "Phone": Phone number if available (string, can be null)
     - "Skills": List of specific technical and professional skills (list of strings, minimum 5 items)
     - "Total_Years_Experience": Total years of professional experience (integer, minimum 0)
     
     IMPORTANT:
     - Extract SPECIFIC skills like "Python", "AWS", "Project Management", NOT vague terms like "Technical Skills"
-    - Name: If not clearly stated, derive from context or use a placeholder like "Not Provided"
-    - Email: Look for email addresses anywhere in text
-    - Skills: Extract minimum 5-10 distinct skills
-    - Years: Look for any mention of years of experience
+    - Name: ALWAYS provide a name. If not clearly stated, extract from email, header, or context. Use "Not Provided" ONLY as absolute last resort.
+    - Email: ALWAYS look for email addresses anywhere in text. If found, include it. Never return null.
+    - Skills: Extract minimum 5-10 distinct skills. If fewer than 5 found, infer reasonable ones based on role.
+    - Years: Look for any mention of years of experience. Default to 0 if not mentioned.
+    - If any field cannot be populated, use a sensible string value instead of null.
     
     Resume Text:
     {text}
@@ -150,20 +192,25 @@ def parse_resume_with_llm(text: str) -> dict:
         response_text = _call_gemini_with_retry(prompt)
         if response_text:
             parsed = json.loads(response_text)
+            name = parsed.get('Name') or _extract_name_from_text(text)
+            email = parsed.get('Email') or _extract_email_from_text(text)
+            
+            # Ensure non-empty values
+            name = name if name and name.strip() else _extract_name_from_text(text)
+            email = email if email and email.strip() else _extract_email_from_text(text)
+            
             result = {
-                'Name': parsed.get('Name') or _extract_name_from_text(text),
-                'Email': parsed.get('Email') or _extract_email_from_text(text),
+                'Name': name,
+                'Email': email,
                 'Phone': parsed.get('Phone'),
                 'Skills': parsed.get('Skills') or [],
                 'Total_Years_Experience': parsed.get('Total_Years_Experience') or 0
             }
             
-            # Ensure Skills is a valid list with at least some content
             if not isinstance(result['Skills'], list):
                 result['Skills'] = []
             
             if len(result['Skills']) == 0:
-                # Extract skills as fallback
                 skill_match = re.findall(r'(Python|Java|JavaScript|React|Node|AWS|Azure|Docker|Kubernetes|SQL|NoSQL|Git|Linux|Windows|Leadership|Communication|Problem[\s-]?Solving|Project Management|Agile|Scrum)', text, re.IGNORECASE)
                 result['Skills'] = list(dict.fromkeys(skill_match))[:10]
             
@@ -245,7 +292,6 @@ def generate_template(job_description: str) -> dict:
                 if result["key_sections"] and result["suggested_bullets"]:
                     return result
         
-        # Fallback with smart suggestions based on job description
         return _generate_template_fallback(job_description)
     except json.JSONDecodeError:
         return _generate_template_fallback(job_description)
@@ -396,7 +442,6 @@ def categorize_missing_skills(missing_skills: list, job_description: str, presen
                 break
         
         if not assigned:
-            # Default to high priority if unknown
             categorized["high_priority_skills"].append({"skill": skill, "timeframe": "4-8 weeks", "learning_path": "Research + practice", "impact": 7})
     
     return {
@@ -409,7 +454,6 @@ def categorize_missing_skills(missing_skills: list, job_description: str, presen
 def analyze_skill_gaps(resume_text: str, job_description: str) -> dict:
     """Extract and categorize skill gaps using Gemini AI with detailed analysis."""
     
-    # Stage 1: Extract skills from resume and job description
     extraction_prompt = f"""
     You are an expert technical recruiter with 20+ years of experience. Your task is to extract and compare skills.
     
@@ -543,7 +587,6 @@ def _get_skill_development_plan(missing_skills: list, job_description: str, pres
 def _fallback_skill_gap_analysis(resume_text: str, job_description: str) -> dict:
     """Fallback skill gap analysis when Gemini fails."""
     
-    # Extract common skills using regex
     skill_patterns = {
         "programming": r"\b(Python|Java|JavaScript|TypeScript|C\+\+|C#|Go|Rust|Ruby|PHP|Swift|Kotlin|R|MATLAB|Scala)\b",
         "web": r"\b(React|Vue|Angular|Node\.js|Express|Django|Flask|Spring|FastAPI|Next\.js|Svelte|HTML|CSS|SASS|Bootstrap)\b",

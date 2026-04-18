@@ -52,8 +52,8 @@ def check():
         metadata = extract_metadata(file_path)
         
         normalized_data = {
-            'name': metadata.get('Name'),
-            'email': metadata.get('Email'),
+            'name': metadata.get('Name') or "Not provided",
+            'email': metadata.get('Email') or "Not provided",
             'metadata': metadata
         }
         
@@ -102,8 +102,8 @@ def analyze():
         grammar_check = check_grammar_with_gemma(raw_text)
 
         normalized_data = {
-            'name': extracted_entities.get('Name'),
-            'email': extracted_entities.get('Email'),
+            'name': extracted_entities.get('Name') or "Not provided",
+            'email': extracted_entities.get('Email') or "Not provided",
             'skills': extracted_entities.get('Skills') or [],
             'years_of_experience': extracted_entities.get('Total_Years_Experience') or 0
         }

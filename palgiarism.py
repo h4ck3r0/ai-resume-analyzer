@@ -13,7 +13,7 @@ def check_plagiarism_with_gemini(resume_text: str, creator: str = None) -> dict:
         import json
         import re
         
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         
         prompt = f"""You are a plagiarism detector. Analyze this resume carefully for authenticity and originality.
 
@@ -51,7 +51,6 @@ IMPORTANT: If the resume is from a template tool like Canva, score should be LOW
                     "error": None
                 }
             except (json.JSONDecodeError, ValueError) as parse_error:
-                # If it's from a known template creator, mark as plagiarized
                 if creator and any(template in creator.lower() for template in ['canva', 'template', 'resume builder']):
                     return {
                         "plagiarism_score": 35,
@@ -66,7 +65,6 @@ IMPORTANT: If the resume is from a template tool like Canva, score should be LOW
                     "error": None
                 }
         else:
-            # If creator is from known template tool
             if creator and any(template in creator.lower() for template in ['canva', 'template', 'resume builder']):
                 return {
                     "plagiarism_score": 35,
@@ -82,7 +80,6 @@ IMPORTANT: If the resume is from a template tool like Canva, score should be LOW
                 "error": None
             }
     except Exception as e:
-        # If creator is from known template tool
         if creator and any(template in creator.lower() for template in ['canva', 'template', 'resume builder']):
             return {
                 "plagiarism_score": 35,
@@ -98,6 +95,7 @@ IMPORTANT: If the resume is from a template tool like Canva, score should be LOW
         }
 
 def extract_metadata(file_path):
+    import re
     ext = os.path.splitext(file_path)[1].lower()
 
     try:
@@ -149,8 +147,46 @@ def extract_metadata(file_path):
         
         resume_text = extract_resume_text(file_path)
         if "Error" not in resume_text:
+            def extract_name(text):
+                if not text:
+                    return "Not provided"
+                lines = text.strip().split('\n')
+                for line in lines[:15]:
+                    line = line.strip()
+                    if not line or len(line) < 2 or len(line) > 60:
+                        continue
+                    if '@' in line or '.com' in line.lower() or 'http' in line.lower():
+                        continue
+                    headers = ['phone', 'email', 'linkedin', 'github', 'website', 'address', 'objective', 
+                              'summary', 'experience', 'education', 'skills']
+                    if any(h in line.lower() for h in headers):
+                        continue
+                    words = line.split()
+                    if 1 <= len(words) <= 4 and line[0].isupper() and not line.isupper():
+                        return line
+                email_match = re.search(r'([a-zA-Z0-9._%+-]+)@', text)
+                if email_match:
+                    name_from_email = email_match.group(1).replace('.', ' ').replace('_', ' ').title()
+                    if len(name_from_email) > 2:
+                        return name_from_email
+                return "Not provided"
+            
+            def extract_email(text):
+                if not text:
+                    return "Not provided"
+                email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', text)
+                if email_match:
+                    return email_match.group()
+                return "Not provided"
+            
+            metadata['Name'] = extract_name(resume_text)
+            metadata['Email'] = extract_email(resume_text)
+            
             plagiarism_result = check_plagiarism_with_gemini(resume_text, metadata.get("creator"))
             metadata.update(plagiarism_result)
+        else:
+            metadata['Name'] = "Not provided"
+            metadata['Email'] = "Not provided"
         
         return metadata
 

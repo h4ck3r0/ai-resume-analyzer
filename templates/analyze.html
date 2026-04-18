@@ -79,17 +79,17 @@
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
                 <div style="padding: 0.75rem; background: #f9fafb; border-left: 2px solid #6366f1; border-radius: 4px;">
                     <div style="font-size: 0.8rem; color: #6b7280;">Name</div>
-                    <div style="font-weight: 600; color: #1f2937;">{{ data.get('name') if data.get('name') else 'Not found' }}</div>
+                    <div style="font-weight: 600; color: #1f2937;">{{ data.get('name', 'Not provided') }}</div>
                 </div>
                 <div style="padding: 0.75rem; background: #f9fafb; border-left: 2px solid #6366f1; border-radius: 4px;">
                     <div style="font-size: 0.8rem; color: #6b7280;">Email</div>
-                    <div style="font-weight: 600; color: #6366f1;">{{ data.get('email') if data.get('email') else 'Not found' }}</div>
+                    <div style="font-weight: 600; color: #6366f1;">{{ data.get('email', 'Not provided') }}</div>
                 </div>
                 <div style="padding: 0.75rem; background: #f9fafb; border-left: 2px solid #6366f1; border-radius: 4px;">
                     <div style="font-size: 0.8rem; color: #6b7280;">Experience</div>
                     <div style="font-weight: 600; color: #1f2937;">
                         {% set exp = data.get('years_of_experience') %}
-                        {% if exp and exp > 0 %}{{ exp }} year{% if exp != 1 %}s{% endif %}{% else %}Not found{% endif %}
+                        {% if exp and exp > 0 %}{{ exp }} year{% if exp != 1 %}s{% endif %}{% else %}Not provided{% endif %}
                     </div>
                 </div>
             </div>
