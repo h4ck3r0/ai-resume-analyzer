@@ -10,7 +10,7 @@ from grammar_checker import check_grammar_with_gemma
 from analyzer_details import (extract_education, extract_work_experience, extract_contact_info,
                               analyze_ats_compliance, analyze_keyword_match, analyze_action_verbs,
                               analyze_quantification, analyze_length_and_format)
-
+from palgiarism import extract_metadata
 app = Flask(__name__)
 
 UPLOAD_DIR = "uploads"
@@ -25,6 +25,49 @@ def home():
 def about():
     """Renders the About Page."""
     return render_template('about.html')
+
+@app.route('/palgiarism', methods=['GET', 'POST'])
+def check():
+    if request.method == 'GET':
+        return render_template('palgiarism.html', data={})
+    
+    if 'resume' not in request.files:
+        return render_template('palgiarism.html', error="No file uploaded.", data={})
+    
+    resume_file = request.files['resume']
+    
+    filename = secure_filename(resume_file.filename)
+    file_path = os.path.join(UPLOAD_DIR, filename)
+    resume_file.save(file_path)
+    
+    try:
+        is_valid, validation_msg = validate_upload(resume_file.filename, file_path)
+        if not is_valid:
+            return render_template('palgiarism.html', error=validation_msg, data={})
+        
+        raw_text = extract_resume_text(file_path)
+        if "Error" in raw_text:
+            return render_template('palgiarism.html', error=raw_text, data={})
+        
+        metadata = extract_metadata(file_path)
+        
+        normalized_data = {
+            'name': metadata.get('Name'),
+            'email': metadata.get('Email'),
+            'metadata': metadata
+        }
+        
+        return render_template('palgiarism.html', 
+                               data=normalized_data,
+                               metadata=metadata)
+    
+    except Exception as e:
+        return render_template('palgiarism.html', error=f"An error occurred: {str(e)}", data={})
+    
+    finally:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
 
 @app.route('/analyze', methods=['GET', 'POST'])
 def analyze():

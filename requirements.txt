@@ -4,7 +4,7 @@ python-docx
 sentence-transformers
 scikit-learn
 werkzeug
-google-genai
+google-generativeai
 python-dotenv
 reportlab
 textblob

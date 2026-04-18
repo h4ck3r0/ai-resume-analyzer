@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="padding: 3rem 2rem; max-width: 1400px; margin: 0 auto;">
+    {% if not metadata %}
+    <!-- Hero Section -->
+    <div style="text-align: center; margin-bottom: 3rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 2rem;">
+        <h1 style="font-size: 2.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">Plagiarism & Metadata Checker</h1>
+        <p style="font-size: 1rem; color: #6b7280;">Upload your resume to check for plagiarism and extract metadata information</p>
+    </div>
+
+    <!-- Upload Form -->
+    <form method="POST" enctype="multipart/form-data" style="background: white; border: 1px solid #e5e7eb; padding: 2.5rem; border-radius: 8px; max-width: 600px; margin: 0 auto;">
+        {% if error %}
+            <div style="background: #fee2e2; border-left: 4px solid #ef4444; color: #dc2626; padding: 1rem; border-radius: 6px; margin-bottom: 2rem;">
+                <strong>Error:</strong> {{ error }}
+            </div>
+        {% endif %}
+
+        <div style="margin-bottom: 2rem;">
+            <label style="font-weight: 600; color: #1f2937; display: block; margin-bottom: 0.75rem;">Upload Resume</label>
+            <div style="border: 2px dashed #d1d5db; padding: 2.5rem; border-radius: 6px; text-align: center; background: #f9fafb; cursor: pointer;" 
+                 onmouseover="this.style.borderColor='#9ca3af'; this.style.background='#f3f4f6';" 
+                 onmouseout="this.style.borderColor='#d1d5db'; this.style.background='#f9fafb';">
+                <input type="file" id="resume" name="resume" accept=".pdf,.docx,.doc,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required style="display: none;" 
+                       onchange="document.getElementById('fileName').textContent = this.files[0].name; document.getElementById('uploadStatus').style.display='block';">
+                <label for="resume" style="cursor: pointer; display: block;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
+                    <strong style="color: #1f2937;">Click to upload resume</strong>
+                    <p style="color: #6b7280; font-size: 0.85rem; margin-top: 0.5rem;">PDF, DOCX, or DOC format</p>
+                </label>
+                <div id="uploadStatus" style="display: none; margin-top: 1rem; padding: 0.75rem; background: #d1fae5; color: #065f46; border-radius: 4px; font-size: 0.9rem;">
+                    File selected: <span id="fileName" style="font-weight: 600;"></span>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" style="background: #6366f1; color: white; padding: 1rem; border: none; border-radius: 6px; font-weight: 600; width: 100%; cursor: pointer; font-size: 1rem; transition: background 0.2s;" 
+                onmouseover="this.style.background='#4f46e5'" 
+                onmouseout="this.style.background='#6366f1'">
+            Check Plagiarism & Metadata
+        </button>
+    </form>
+
+    {% else %}
+    <div style="text-align: center; margin-bottom: 2rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 2rem;">
+        <div style="font-size: 2rem; font-weight: 700; color: #6366f1; margin-bottom: 0.5rem;">✓ Analysis Complete</div>
+        <div style="font-size: 1rem; color: #6b7280;">Metadata extracted and plagiarism check completed</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+     
+        <div style="border: 1px solid #e5e7eb; padding: 2rem; border-radius: 8px; background: white;">
+            <h3 style="margin-bottom: 1.5rem; color: #1f2937; font-weight: 600; font-size: 1.1rem;">📋 Contact Information</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="padding: 0.75rem; background: #f9fafb; border-left: 3px solid #6366f1; border-radius: 4px;">
+                    <div style="font-size: 0.85rem; color: #6b7280; font-weight: 500; margin-bottom: 0.25rem;">Name</div>
+                    <div style="color: #1f2937; font-weight: 600;">{{ data.name or 'Not found' }}</div>
+                </div>
+                <div style="padding: 0.75rem; background: #f9fafb; border-left: 3px solid #6366f1; border-radius: 4px;">
+                    <div style="font-size: 0.85rem; color: #6b7280; font-weight: 500; margin-bottom: 0.25rem;">Email</div>
+                    <div style="color: #1f2937; font-weight: 600;">{{ data.email or 'Not found' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Document Origin -->
+        <div style="border: 1px solid #e5e7eb; padding: 2rem; border-radius: 8px; background: white;">
+            <h3 style="margin-bottom: 1.5rem; color: #1f2937; font-weight: 600; font-size: 1.1rem;">📄 Document Origin</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="padding: 1rem; background: linear-gradient(135deg, #e0e7ff 0%, #f0f9ff 100%); border-left: 4px solid #6366f1; border-radius: 4px;">
+                    <div style="font-size: 0.85rem; color: #4338ca; font-weight: 600; margin-bottom: 0.25rem;">Created With</div>
+                    <div style="color: #312e81; font-weight: 700; font-size: 1.1rem;">
+                        {% if metadata.get('creator') %}
+                            {{ metadata.creator }}
+                        {% else %}
+                            Unknown Tool
+                        {% endif %}
+                    </div>
+                </div>
+                <div style="padding: 0.75rem; background: #f9fafb; border-left: 3px solid #6366f1; border-radius: 4px;">
+                    <div style="font-size: 0.85rem; color: #6b7280; font-weight: 500; margin-bottom: 0.25rem;">File Type</div>
+                    <div style="color: #1f2937; font-weight: 600;">
+                        {% if metadata.get('type') %}
+                            {{ metadata.type }}
+                        {% else %}
+                            Unknown
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plagiarism Status -->
+    <div style="border: 1px solid #e5e7eb; padding: 2rem; border-radius: 8px; background: white; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; color: #1f2937; font-weight: 600; font-size: 1.1rem;">🔒 Plagiarism Analysis</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div style="padding: 1.5rem; background: {% if metadata.get('plagiarism_score', 0) >= 80 %}#d1fae5{% elif metadata.get('plagiarism_score', 0) >= 50 %}#fef3c7{% else %}#fee2e2{% endif %}; border-left: 4px solid {% if metadata.get('plagiarism_score', 0) >= 80 %}#10b981{% elif metadata.get('plagiarism_score', 0) >= 50 %}#f59e0b{% else %}#ef4444{% endif %}; border-radius: 4px;">
+                <div style="font-size: 0.85rem; color: {% if metadata.get('plagiarism_score', 0) >= 80 %}#065f46{% elif metadata.get('plagiarism_score', 0) >= 50 %}#92400e{% else %}#7f1d1d{% endif %}; font-weight: 500; margin-bottom: 0.5rem;">Plagiarism Score</div>
+                <div style="color: {% if metadata.get('plagiarism_score', 0) >= 80 %}#065f46{% elif metadata.get('plagiarism_score', 0) >= 50 %}#92400e{% else %}#7f1d1d{% endif %}; font-weight: 700; font-size: 1.75rem;">{{ metadata.get('plagiarism_score', 'N/A') }}%</div>
+                <div style="font-size: 0.8rem; color: {% if metadata.get('plagiarism_score', 0) >= 80 %}#047857{% elif metadata.get('plagiarism_score', 0) >= 50 %}#b45309{% else %}#b91c1c{% endif %}; margin-top: 0.5rem;">{{ metadata.get('authenticity', 'Unknown') }}</div>
+            </div>
+            <div style="padding: 1.5rem; background: #f3f4f6; border-left: 4px solid #6366f1; border-radius: 4px;">
+                <div style="font-size: 0.85rem; color: #6b7280; font-weight: 500; margin-bottom: 0.5rem;">Analysis Details</div>
+                <div style="color: #1f2937; font-size: 0.95rem; line-height: 1.5;">{{ metadata.get('reasoning', 'Analysis in progress...') }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Metadata -->
+    {% if metadata %}
+    <div style="border: 1px solid #e5e7eb; padding: 2rem; border-radius: 8px; background: white; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; color: #1f2937; font-weight: 600; font-size: 1.1rem;">📊 Extracted Metadata</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+            {% for key, value in metadata.items() %}
+                {% if value %}
+                    <div style="padding: 1rem; background: #f9fafb; border-radius: 6px; border-left: 3px solid #6366f1;">
+                        <div style="font-size: 0.85rem; color: #6b7280; font-weight: 500; margin-bottom: 0.5rem; text-transform: capitalize;">{{ key.replace('_', ' ') }}</div>
+                        <div style="color: #1f2937; font-weight: 600; white-space: pre-wrap; word-break: break-word;">
+                            {% if value is iterable and value is not string %}
+                                {{ value|join(', ') }}
+                            {% else %}
+                                {{ value }}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('check') }}" style="background: #6366f1; color: white; padding: 1rem 2rem; border-radius: 6px; text-decoration: none; font-weight: 600; cursor: pointer; transition: background 0.2s;" 
+           onmouseover="this.style.background='#4f46e5'" 
+           onmouseout="this.style.background='#6366f1'">
+            Check Another Resume
+        </a>
+        <a href="{{ url_for('home') }}" style="background: #e5e7eb; color: #1f2937; padding: 1rem 2rem; border-radius: 6px; text-decoration: none; font-weight: 600; cursor: pointer; transition: background 0.2s;" 
+           onmouseover="this.style.background='#d1d5db'" 
+           onmouseout="this.style.background='#e5e7eb'">
+            Back to Home
+        </a>
+    </div>
+
+    {% endif %}
+</div>
+{% endblock %}
